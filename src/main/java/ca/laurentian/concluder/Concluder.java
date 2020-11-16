@@ -1,6 +1,6 @@
 package ca.laurentian.concluder;
 
-import ca.laurentian.concluder.EntityRelations.RelateForm;
+import ca.laurentian.concluder.entityRelations.RelateForm;
 import ca.laurentian.concluder.refactorState.FileIO;
 import ca.laurentian.concluder.refactorState.HierarchyVisualization;
 import ca.laurentian.concluder.refactorState.NewNodeDialog;
@@ -11,18 +11,34 @@ import ca.laurentian.concluder.refactorState.SystemSettings;
 import ca.laurentian.concluder.refactorState.TreeStructureValidation;
 import ca.laurentian.concluder.refactorState.View_Mode_Administrator;
 import ca.laurentian.concluder.refactorState.Weight_Redistributor;
-import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme;
-import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatDraculaIJTheme;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Tree;
 import prefuse.visual.VisualItem;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.border.EtchedBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Panel;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -32,6 +48,10 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+
+import static ca.laurentian.concluder.constants.ConcluderConstant.RELATE;
+import static ca.laurentian.concluder.constants.ConcluderConstant.UNLINK;
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 
 public class Concluder {
     //define graph,nodes,edges to store the data from xml file
@@ -47,8 +67,8 @@ public class Concluder {
     //current selected node ID
     int SelectedNodeID;//store the id of the selected node
     //holds all selected node IDs
-    ArrayList<String> selectednode = new ArrayList<String>();//store all highlighted nodes
-    ArrayList<VisualItem> selectedNodeVisualItem = new ArrayList<VisualItem>();
+    ArrayList<String> selectedNode = new ArrayList<>();//store all highlighted nodes
+    ArrayList<VisualItem> selectedNodeVisualItem = new ArrayList<>();
     File file = null;//store the opened xml file
     //this will likely be changed to Tree
     Tree tree = null;
@@ -89,6 +109,7 @@ public class Concluder {
                 System.exit(0);
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         fio = new FileIO();
@@ -149,10 +170,10 @@ public class Concluder {
                 .getResource("/images/trash.png")), "Delete selected node");
         btnLink = new ToolbarButton("Link", new ImageIcon(getClass()
                 .getResource("/images/link_int.png")), "Link");
-        btnUnlink = new ToolbarButton("Unlink", new ImageIcon(getClass()
-                .getResource("/images/unlink_int.png")), "Unlink");
-        tbb = new ToolbarButton("Relate", new ImageIcon(getClass()
-                .getResource("/images/balance-scale.png")), "Relate");
+        btnUnlink = new ToolbarButton(UNLINK, new ImageIcon(getClass()
+                .getResource("/images/unlink_int.png")), UNLINK);
+        tbb = new ToolbarButton(RELATE, new ImageIcon(getClass()
+                .getResource("/images/balance-scale.png")), RELATE);
         toolbar.setFloatable(true);
         toolbar.add(btnNew);
         toolbar.add(btnOpen);
@@ -210,10 +231,10 @@ public class Concluder {
         JMenu mnuCriteria = new JMenu("Criteria");
         JMenuItem mnuItemEdit = new JMenuItem("Edit");
         JMenuItem mnuItemLink = new JMenuItem("Link");
-        JMenuItem mnuItemUnlink = new JMenuItem("Unlink");
+        JMenuItem mnuItemUnlink = new JMenuItem(UNLINK);
         JMenu mnuArrange = new JMenu("Arrange");
         JMenu mnuAnalyze = new JMenu("Analyze");
-        JMenuItem mnuItemRelate = new JMenuItem("Relate");
+        JMenuItem mnuItemRelate = new JMenuItem(RELATE);
         JMenuItem mnuItemAnalyze = new JMenuItem("Analyze");
         JMenuItem mnuItemOutputPC = new JMenuItem("Output");
         JMenu mnuWeights = new JMenu("Weights");
@@ -343,11 +364,7 @@ public class Concluder {
         warn.add(p1, BorderLayout.NORTH);
         warn.add(p2, BorderLayout.SOUTH);
         warn.setVisible(true);
-        ok.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                warn.dispose();
-            }
-        });
+        ok.addActionListener(e -> warn.dispose());
     }
 
     //quit the opened hierarchy model
@@ -355,14 +372,12 @@ public class Concluder {
         if (file != null) {
             String message = "Do you want to save the changes you made to " + file.getName() + "?";
             int response = JOptionPane.showConfirmDialog(frame, message, "Save Model", JOptionPane.YES_NO_CANCEL_OPTION);
-            switch (response) {
-                case JOptionPane.YES_OPTION: {
-                    fio.saveFile(file, tree, graph, fileType);
-                    close();
-                }
-                case JOptionPane.NO_OPTION: {
-                    close();
-                }
+            if (response == JOptionPane.YES_OPTION) {
+                fio.saveFile(file, tree, graph, fileType);
+                close();
+                close();
+            } else if (response == JOptionPane.NO_OPTION) {
+                close();
             }
         } else {
             close();
@@ -386,7 +401,7 @@ public class Concluder {
         int x = (int) (scrnsize.getWidth() - frame.getWidth()) / 2;
         int y = (int) (scrnsize.getHeight() - frame.getHeight()) / 2;
         frame.setLocation(x, y);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new ListenCloseWdw());
     }
 
@@ -435,7 +450,7 @@ public class Concluder {
             //initial launch or previous file was closed
             if (file != null) {
                 String exception = fio.saveFile(file, tree, graph, fileType);
-                if (exception != "0") {
+                if (!exception.equals("0")) {
                 }
             } else {
             }
@@ -449,9 +464,6 @@ public class Concluder {
             if (file != null) {
                 String exception = fio.saveFileAs(curDir, file.getName().substring(0, file.getName().indexOf(".")), graph, tree, fileType);
                 curDir = fio.getCurrentDirectory();
-                if (exception != "0") {
-                }
-            } else {
             }
         }
     }
@@ -467,7 +479,7 @@ public class Concluder {
             if (hv.d != null)
                 frame.remove(hv.d);
             hv = new HierarchyVisualization();
-            hv.Create(fileType, frame, graph,/*frame.getSize().width/2, frame.getSize().height/4,*/ selectednode, selectedNodeVisualItem);
+            hv.Create(fileType, frame, graph,/*frame.getSize().width/2, frame.getSize().height/4,*/ selectedNode, selectedNodeVisualItem);
             new View_Mode_Administrator(viewMode, tree);
             frame.setTitle("JConcluder - " + file.getName());
             enableMenuItems(true);
@@ -488,7 +500,7 @@ public class Concluder {
                 if (hv.d != null)
                     frame.remove(hv.d);
                 hv = new HierarchyVisualization();
-                hv.Create(fileType, frame, graph,/*frame.getSize().width/2, frame.getSize().height/4,*/ selectednode, selectedNodeVisualItem);
+                hv.Create(fileType, frame, graph,/*frame.getSize().width/2, frame.getSize().height/4,*/ selectedNode, selectedNodeVisualItem);
                 frame.setTitle("JConcluder - " + file.getName());
                 enableMenuItems(true);
             } else if (fileType.compareTo(SystemConfiguration.GRAPH_FILE) == 0) {
@@ -497,7 +509,7 @@ public class Concluder {
                 if (hv.d != null)
                     frame.remove(hv.d);
                 hv = new HierarchyVisualization();
-                hv.Create(fileType, frame, graph,/*frame.getSize().width/2, frame.getSize().height/4,*/ selectednode, selectedNodeVisualItem);
+                hv.Create(fileType, frame, graph,/*frame.getSize().width/2, frame.getSize().height/4,*/ selectedNode, selectedNodeVisualItem);
                 new View_Mode_Administrator(viewMode, graph);
                 frame.setTitle("JConcluder - " + file.getName());
                 enableMenuItems(true);
@@ -515,12 +527,11 @@ public class Concluder {
                 frame.remove(hv.d);
                 statusbar.setText("File closed.");
                 enableMenuItems(false);
-            } else {
             }
         }
     }
 
-    public class ListenNodeAdd implements ActionListener {
+    public class ListenNodeAdd implements ActionListener  {
         public void actionPerformed(ActionEvent event) {
             if (hv.SelectedNodeID != -1) {
                 ///enabled form for node creation
@@ -543,7 +554,7 @@ public class Concluder {
                         //all criteria is valid, node can be created
                         if (nnd.validSubmission()) {
                             frame.remove(hv.d);
-                            new addNewNode(graph, graph.getNode(hv.getSelectedNodeID()), nnd.getName(), nnd.getDesc(), frame, viewMode);
+                            new AddNewNode(graph, graph.getNode(hv.getSelectedNodeID()), nnd.getName(), nnd.getDesc(), frame, viewMode);
                             viewModeRequested(viewMode);
                             hv.runLayout();
                             frame.add(hv.d);
@@ -576,16 +587,16 @@ public class Concluder {
     public class ListenNodeDelete implements ActionListener {
         public void actionPerformed(ActionEvent event) {
 
-            if (selectednode.size() > 0) {
+            if (!selectedNode.isEmpty()) {
                 new RemoveNode(graph, hv.getSelectedNodeID(), hv.currentItem, viewMode);
                 if (RemoveNode.removedSuccess) {
                     viewModeRequested(viewMode);
-                    int index = selectednode.indexOf(String.valueOf(hv.SelectedNodeID));
-                    selectednode.remove(index);
+                    int index = selectedNode.indexOf(String.valueOf(hv.SelectedNodeID));
+                    selectedNode.remove(index);
                     selectedNodeVisualItem.remove(index);
                     //update selected node to last selected
-                    if (selectednode.size() > 0)
-                        hv.SelectedNodeID = Integer.parseInt(selectednode.get(selectednode.size() - 1));
+                    if (!selectedNode.isEmpty())
+                        hv.SelectedNodeID = Integer.parseInt(selectedNode.get(selectedNode.size() - 1));
                     else
                         hv.SelectedNodeID = -1;
                 }
@@ -643,7 +654,7 @@ public class Concluder {
     //connect two nodes
     public class ListenLink implements ActionListener {
         public void actionPerformed(ActionEvent event) {
-            if (selectednode.size() == 2)//connect 2 selected nodes
+            if (selectedNode.size() == 2)//connect 2 selected nodes
             {
 
                 if (fileType.compareTo(SystemConfiguration.TREE_FILE) == 0) {
@@ -657,22 +668,24 @@ public class Concluder {
                     Tree temp = ((RootableTree) init.clone()).getClone();
 
                     int e;
-                    if (Integer.parseInt(selectednode.get(0)) > Integer.parseInt(selectednode.get(1)))
-                        e = temp.addChildEdge(Integer.parseInt(selectednode.get(1)), Integer.parseInt(selectednode.get(0)));
+                    if (Integer.parseInt(selectedNode.get(0)) > Integer.parseInt(selectedNode.get(1)))
+                        e = temp.addChildEdge(Integer.parseInt(selectedNode.get(1)), Integer.parseInt(selectedNode.get(0)));
                     else
-                        e = temp.addChildEdge(Integer.parseInt(selectednode.get(0)), Integer.parseInt(selectednode.get(1)));
+                        e = temp.addChildEdge(Integer.parseInt(selectedNode.get(0)), Integer.parseInt(selectedNode.get(1)));
                     if (TreeStructureValidation.testCycleExistence(graph)) {
                         JOptionPane.showMessageDialog(frame, "Can not add this edge.\nInvalidates tree structure", "Invalid Request", JOptionPane.ERROR_MESSAGE);
                         temp.removeChildEdge(e);
                     } else {
-                        if (Integer.parseInt(selectednode.get(0)) > Integer.parseInt(selectednode.get(1)))
-                            ((Tree) graph).addChildEdge(Integer.parseInt(selectednode.get(1)), Integer.parseInt(selectednode.get(0)));
+                        if (Integer.parseInt(selectedNode.get(0)) > Integer.parseInt(selectedNode.get(1)))
+                            ((Tree) graph).addChildEdge(Integer.parseInt(selectedNode.get(1)), Integer.parseInt(
+                                    selectedNode.get(0)));
                         else
-                            ((Tree) graph).addChildEdge(Integer.parseInt(selectednode.get(0)), Integer.parseInt(selectednode.get(1)));
-                        JOptionPane.showMessageDialog(frame, graph.getNode(Integer.parseInt(selectednode.get(0))).getChildCount());
+                            ((Tree) graph).addChildEdge(Integer.parseInt(selectedNode.get(0)), Integer.parseInt(
+                                    selectedNode.get(1)));
+                        JOptionPane.showMessageDialog(frame, graph.getNode(Integer.parseInt(selectedNode.get(0))).getChildCount());
                     }
                 } else
-                    graph.addEdge(Integer.parseInt(selectednode.get(0)), Integer.parseInt(selectednode.get(1)));
+                    graph.addEdge(Integer.parseInt(selectedNode.get(0)), Integer.parseInt(selectedNode.get(1)));
             } else {
                 warnWindow("You need 2 nodes to Link.", 400, 100);
             }
@@ -683,7 +696,7 @@ public class Concluder {
     //unconnect two nodes
     public class ListenUnlink implements ActionListener {
         public void actionPerformed(ActionEvent event) {
-            if (selectednode.size() == 2)//unconnect 2 nodes
+            if (selectedNode.size() == 2)//unconnect 2 nodes
             {
                 ///this is unnecessary given node IDs and edge IDs
 				/*
@@ -696,9 +709,9 @@ public class Concluder {
 				}
 				*/
 
-                Node n1 = graph.getNode(Integer.parseInt(selectednode.get(0)));
-                Node n2 = graph.getNode(Integer.parseInt(selectednode.get(1)));
-                if (Integer.parseInt(selectednode.get(0)) > Integer.parseInt(selectednode.get(1))) {
+                Node n1 = graph.getNode(Integer.parseInt(selectedNode.get(0)));
+                Node n2 = graph.getNode(Integer.parseInt(selectedNode.get(1)));
+                if (Integer.parseInt(selectedNode.get(0)) > Integer.parseInt(selectedNode.get(1))) {
                     Edge e = graph.getEdge(n2, n1);
                     ((Tree) graph).removeChildEdge(e);
                 } else {
@@ -728,21 +741,21 @@ public class Concluder {
 
             }
 
-            JLabel[] nodeweight = new JLabel[criteria];
-            JLabel[] weightgraph = new JLabel[criteria];
+            JLabel[] nodeWeight = new JLabel[criteria];
+            JLabel[] weightGraph = new JLabel[criteria];
             criteria = 0;
 
             for (int i = 0; i < graph.getNodeCount(); i++) {
                 if (graph.getNode(i).getChildCount() == 0) {
-                    nodeweight[criteria] = new JLabel(SystemConfiguration.formatNumber(graph.getNode(i).getDouble(WEIGHT)) + "%       " + graph.getNode(i).get(NAME));
-                    nodeweight[criteria].setBounds(50, 20 + criteria * 25, 200, 15);
+                    nodeWeight[criteria] = new JLabel(SystemConfiguration.formatNumber(graph.getNode(i).getDouble(WEIGHT)) + "%       " + graph.getNode(i).get(NAME));
+                    nodeWeight[criteria].setBounds(50, 20 + criteria * 25, 200, 15);
                     System.out.println("Bar graph");
-                    weightgraph[criteria] = new JLabel();
-                    weightgraph[criteria].setBounds(200, 20 + criteria * 25, Float.valueOf(graph.getNode(i).get(WEIGHT).toString()).intValue() * 3, 15);
-                    weightgraph[criteria].setOpaque(true);
-                    weightgraph[criteria].setBackground(Color.DARK_GRAY);
-                    p1.add(nodeweight[criteria]);
-                    p1.add(weightgraph[criteria]);
+                    weightGraph[criteria] = new JLabel();
+                    weightGraph[criteria].setBounds(200, 20 + criteria * 25, Float.valueOf(graph.getNode(i).get(WEIGHT).toString()).intValue() * 3, 15);
+                    weightGraph[criteria].setOpaque(true);
+                    weightGraph[criteria].setBackground(Color.DARK_GRAY);
+                    p1.add(nodeWeight[criteria]);
+                    p1.add(weightGraph[criteria]);
                     criteria++;
                 }
             }
@@ -754,11 +767,7 @@ public class Concluder {
             weightframe.add(p1, BorderLayout.CENTER);
             weightframe.add(p2, BorderLayout.SOUTH);
             weightframe.setVisible(true);
-            ok.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    weightframe.dispose();
-                }
-            });
+            ok.addActionListener(e -> weightframe.dispose());
         }
     }
 
@@ -794,9 +803,9 @@ public class Concluder {
             if (file == null)
                 JOptionPane.showMessageDialog(frame, "No file loaded.", "No File", JOptionPane.ERROR_MESSAGE);
             else {
-                if (selectednode.size() > 0) {
-                    int childnumber = graph.getNode(hv.getSelectedNodeID()).getChildCount();
-                    if ((childnumber >= 2) && (childnumber <= 8)) {
+                if (!selectedNode.isEmpty()) {
+                    int childNumber = graph.getNode(hv.getSelectedNodeID()).getChildCount();
+                    if ((childNumber >= 2) && (childNumber <= 8)) {
                         new RelateForm(graph.getNode(hv.getSelectedNodeID()), graph, viewMode);
                     } else {
                         JOptionPane.showMessageDialog(frame, "Node must have atleast 2 children.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -811,10 +820,10 @@ public class Concluder {
     public class ListenAnalyze implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             //store the weights of all child nodes
-            String[] childweight = {"", "", "", "", "", "", ""};
+            String[] childWeight = {"", "", "", "", "", "", ""};
             for (int i = 0; i < graph.getNode(hv.getSelectedNodeID()).getChildCount(); i++) {
                 //child weight
-                childweight[i] = graph.getNode(hv.getSelectedNodeID()).getChild(i).get(1).toString();
+                childWeight[i] = graph.getNode(hv.getSelectedNodeID()).getChild(i).get(1).toString();
             }
 
             //the number of the child nodes must be no less than 3 and no larger than 7
@@ -822,7 +831,7 @@ public class Concluder {
                 // get the ratio relation among all child nodes
                 String relation = graph.getNode(hv.getSelectedNodeID()).get(3).toString();
                 //child weight array of weights, relation composite string of weights from parent
-                new inconsistency(childweight, relation, graph, file, hv.getSelectedNodeID(), viewMode);
+                new Inconsistency(childWeight, relation, graph, file, hv.getSelectedNodeID(), viewMode);
             } else
                 warnWindow("The selected node has to have more than 3 child nodes!", 400, 100);
         }
@@ -842,7 +851,7 @@ public class Concluder {
         }
     }
 
-    public class ListenAbout implements ActionListener {
+    public static class ListenAbout implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
             if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
@@ -865,6 +874,7 @@ public class Concluder {
 
     //close window
     public class ListenCloseWdw extends WindowAdapter {
+        @Override
         public void windowClosing(WindowEvent e) {
             quitFrame();
         }

@@ -1,8 +1,9 @@
 package ca.laurentian.concluder;
 
-import javax.swing.*;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 
 /**
  * FOR WHAT THIS ACTUALLY DOES, THIS IS A DISASTER
@@ -12,6 +13,7 @@ import java.awt.*;
  * @author tylerjessup
  */
 class EvenOddRenderer extends DefaultTableCellRenderer {
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus, int row, int column) {
         Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -19,30 +21,30 @@ class EvenOddRenderer extends DefaultTableCellRenderer {
 
         //highlight an element or a triad
 
-        if (inconsistency.highlighted_k == 100) {
+        if (Inconsistency.highlightedK == 100) {
             //only highlight element aij
-            if (row == inconsistency.highlighted_i && column == inconsistency.highlighted_j) {
+            if (row == Inconsistency.highlightedI && column == Inconsistency.highlightedJ) {
                 background = Color.CYAN;
             } else {
                 background = Color.DARK_GRAY;
             }
-        } else if (inconsistency.highlighted_j == 100) {
+        } else if (Inconsistency.highlightedJ == 100) {
             //only highlight element aik
-            if (row == inconsistency.highlighted_i && column == inconsistency.highlighted_k) {
+            if (row == Inconsistency.highlightedI && column == Inconsistency.highlightedK) {
                 background = Color.CYAN;
             } else {
                 background = Color.DARK_GRAY;
             }
-        } else if (inconsistency.highlighted_i == 100) {
+        } else if (Inconsistency.highlightedI == 100) {
             //only highlight element akj
-            if (row == inconsistency.highlighted_k && column == inconsistency.highlighted_j) {
+            if (row == Inconsistency.highlightedK && column == Inconsistency.highlightedJ) {
                 background = Color.CYAN;
             } else {
                 background = Color.DARK_GRAY;
             }
         } else//highlight a triad with 3 elements(aij,aik,akj)
         {
-            if ((row == inconsistency.highlighted_i && column == inconsistency.highlighted_j) || (row == inconsistency.highlighted_i && column == inconsistency.highlighted_k) || (row == inconsistency.highlighted_k && column == inconsistency.highlighted_j)) {
+            if ((row == Inconsistency.highlightedI && column == Inconsistency.highlightedJ) || (row == Inconsistency.highlightedI && column == Inconsistency.highlightedK) || (row == Inconsistency.highlightedK && column == Inconsistency.highlightedJ)) {
                 background = Color.CYAN;
             } else {
                 background = Color.DARK_GRAY;

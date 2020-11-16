@@ -1,37 +1,60 @@
-package ca.laurentian.concluder.EntityRelations;
+package ca.laurentian.concluder.entityRelations;
 
 import prefuse.data.Graph;
 import prefuse.data.Node;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.font.TextAttribute;
 import java.util.Map;
+
+import static ca.laurentian.concluder.constants.ConcluderConstant.BOUNDS_HEIGHT;
+import static ca.laurentian.concluder.constants.ConcluderConstant.BOUNDS_WIDTH;
+import static ca.laurentian.concluder.constants.ConcluderConstant.BOUNDS_X;
+import static ca.laurentian.concluder.constants.ConcluderConstant.BOUNDS_Y;
+import static ca.laurentian.concluder.constants.ConcluderConstant.BUTTON_NEXT;
+import static ca.laurentian.concluder.constants.ConcluderConstant.BUTTON_PREVIOUS;
+import static ca.laurentian.concluder.constants.ConcluderConstant.ENTITY_RELATION;
+import static ca.laurentian.concluder.constants.ConcluderConstant.LINGUISTIC_EXPRESSION;
+import static ca.laurentian.concluder.constants.ConcluderConstant.ORDER_PRESERVATION;
+import static javax.swing.SwingConstants.TOP;
 
 
 public class RelateForm extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private static JTextField textField_linguisticTerm;
-    private static JComboBox<String> comboBox_linguisticTerm;
+    private static JTextField textFieldLinguisticTerm;
+    private static JComboBox<String> comboBoxLinguisticTerm;
 
-    private static JComboBox<String> comboBox_entityEi;
-    private static JComboBox<String> comboBox_entityEj;
+    private static JComboBox<String> comboBoxEntityEi;
+    private static JComboBox<String> comboBoxEntityEj;
 
-    private static JRadioButton rdbtnYes_entitiesEqual;
-    private static JRadioButton rdbtnYes_entityEi_g_Ej;
-    private static JRadioButton rdbtnNo_entityEi_g_Ej;
-    private static JTextField textField_relativeWeight;
+    private static JRadioButton radioButtonYesEntitiesEqual;
+    private static JRadioButton radioButtonYesEntityEiGEj;
+    private static JRadioButton radioButtonNoEntityEiGEj;
+    private static JTextField textFieldRelativeWeight;
 
     private static JScrollPane scrollPane;
 
@@ -39,26 +62,26 @@ public class RelateForm extends JDialog {
 
     private static JTabbedPane tabbedPaneRef;
 
-    private RelateFormDomain rfd;
+    private RelateFormDomain relateFormDomain;
 
-    public RelateForm(Node _parentNode, Graph g, int _viewMode) {
-        final JDialog ref = this;
-        final Node parentNode = _parentNode;
+    public RelateForm(Node relateFormParentNode, Graph g, int relateFormViewMode) {
+        final JDialog relateFormJDialog = this;
+        final Node parentNode = relateFormParentNode;
         final Graph graph = g;
-        final int viewMode = _viewMode;
+        final int viewMode = relateFormViewMode;
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
-                ref.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                rfd = new RelateFormDomain(parentNode, graph, viewMode);
-                rfd.loadRelateForm();
-                ref.validate();
-                ref.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                relateFormJDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                relateFormDomain = new RelateFormDomain(parentNode, graph, viewMode);
+                relateFormDomain.loadRelateForm();
+                relateFormJDialog.validate();
+                relateFormJDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         });
-        setTitle("Entity Relations");
+        setTitle(ENTITY_RELATION);
         setLocationRelativeTo(null);
-        setBounds(100, 100, 850, 624);
+        setBounds(BOUNDS_X, BOUNDS_Y, BOUNDS_WIDTH, BOUNDS_HEIGHT);
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[]{0, 0, 0};
         gridBagLayout.rowHeights = new int[]{0, 0, 0};
@@ -66,24 +89,19 @@ public class RelateForm extends JDialog {
         gridBagLayout.rowWeights = new double[]{.25, .70, 0.05};
         getContentPane().setLayout(gridBagLayout);
 
-        final JButton btnNewButton_1 = new JButton("<< Prev");
-        final JButton btnNewButton_2 = new JButton("Next >>");
-        final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        final JButton buttonPrevious = new JButton(BUTTON_PREVIOUS);
+        final JButton buttonNext = new JButton(BUTTON_NEXT);
+        final JTabbedPane tabbedPane = new JTabbedPane(TOP);
         tabbedPaneRef = tabbedPane;
 
-        btnNewButton_1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                btnNewButton_2.setEnabled(true);
-                if (tabbedPane.getSelectedIndex() == 1)
-                    btnNewButton_1.setEnabled(false);
-                else
-                    btnNewButton_1.setEnabled(true);
-                tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() - 1);
-            }
+        buttonPrevious.addActionListener(e -> {
+            buttonNext.setEnabled(true);
+            buttonPrevious.setEnabled(tabbedPane.getSelectedIndex() != 1);
+            tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() - 1);
         });
 
         JPanel panel = new JPanel();
-        panel.setBorder(new TitledBorder(null, "Linguistic Expression Specification", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        panel.setBorder(new TitledBorder(null, LINGUISTIC_EXPRESSION, TitledBorder.LEADING, TitledBorder.TOP, null, null));
         GridBagConstraints gbc_panel = new GridBagConstraints();
         gbc_panel.insets = new Insets(0, 0, 5, 5);
         gbc_panel.fill = GridBagConstraints.BOTH;
@@ -130,12 +148,10 @@ public class RelateForm extends JDialog {
         gbc_label_1.gridy = 0;
         panel_1.add(label_1, gbc_label_1);
 
-        comboBox_linguisticTerm = new JComboBox<String>();
-        comboBox_linguisticTerm.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    rfd.populateUserDefinedLinguisticTerm();
-                }
+        comboBoxLinguisticTerm = new JComboBox<>();
+        comboBoxLinguisticTerm.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                relateFormDomain.populateUserDefinedLinguisticTerm();
             }
         });
         GridBagConstraints gbc_comboBox_linguisticTerm = new GridBagConstraints();
@@ -143,7 +159,7 @@ public class RelateForm extends JDialog {
         gbc_comboBox_linguisticTerm.insets = new Insets(0, 0, 5, 0);
         gbc_comboBox_linguisticTerm.gridx = 1;
         gbc_comboBox_linguisticTerm.gridy = 0;
-        panel_1.add(comboBox_linguisticTerm, gbc_comboBox_linguisticTerm);
+        panel_1.add(comboBoxLinguisticTerm, gbc_comboBox_linguisticTerm);
 
         JPanel panel_2 = new JPanel();
         panel_2.setBorder(new TitledBorder(null, "User Defined Expressions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -167,26 +183,18 @@ public class RelateForm extends JDialog {
         gbc_label_2.gridy = 0;
         panel_2.add(label_2, gbc_label_2);
 
-        textField_linguisticTerm = new JTextField();
-        textField_linguisticTerm.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                rfd.addLinguisticTermToListFromUserDefintion();
-            }
-        });
-        textField_linguisticTerm.setColumns(10);
+        textFieldLinguisticTerm = new JTextField();
+        textFieldLinguisticTerm.addActionListener(e -> relateFormDomain.addLinguisticTermToListFromUserDefinition());
+        textFieldLinguisticTerm.setColumns(10);
         GridBagConstraints gbc_textField_linguisticTerm = new GridBagConstraints();
         gbc_textField_linguisticTerm.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField_linguisticTerm.insets = new Insets(0, 0, 5, 0);
         gbc_textField_linguisticTerm.gridx = 1;
         gbc_textField_linguisticTerm.gridy = 0;
-        panel_2.add(textField_linguisticTerm, gbc_textField_linguisticTerm);
+        panel_2.add(textFieldLinguisticTerm, gbc_textField_linguisticTerm);
 
         JButton button = new JButton("Add Expression");
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                rfd.addLinguisticTermToListFromUserDefintion();
-            }
-        });
+        button.addActionListener(e -> relateFormDomain.addLinguisticTermToListFromUserDefinition());
         GridBagConstraints gbc_button = new GridBagConstraints();
         gbc_button.anchor = GridBagConstraints.FIRST_LINE_END;
         gbc_button.gridx = 1;
@@ -197,22 +205,17 @@ public class RelateForm extends JDialog {
         gbc_btnNewButton_1.gridy = 2;
         gbc_btnNewButton_1.insets = new Insets(0, 0, 0, 5);
         gbc_btnNewButton_1.fill = GridBagConstraints.BOTH;
-        getContentPane().add(btnNewButton_1, gbc_btnNewButton_1);
-        btnNewButton_2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                btnNewButton_1.setEnabled(true);
-                if (tabbedPane.getSelectedIndex() == tabbedPane.getTabCount() - 2)
-                    btnNewButton_2.setEnabled(false);
-                else
-                    btnNewButton_2.setEnabled(true);
-                tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
-            }
+        getContentPane().add(buttonPrevious, gbc_btnNewButton_1);
+        buttonNext.addActionListener(e -> {
+            buttonPrevious.setEnabled(true);
+            buttonNext.setEnabled(tabbedPane.getSelectedIndex() != tabbedPane.getTabCount() - 2);
+            tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
         });
         GridBagConstraints gbc_btnNewButton_2 = new GridBagConstraints();
         gbc_btnNewButton_2.gridx = 2;
         gbc_btnNewButton_2.gridy = 2;
         gbc_btnNewButton_2.fill = GridBagConstraints.BOTH;
-        getContentPane().add(btnNewButton_2, gbc_btnNewButton_2);
+        getContentPane().add(buttonNext, gbc_btnNewButton_2);
 
 
         tabbedPane.addTab("Instructions", createInstructionsTab());
@@ -220,19 +223,16 @@ public class RelateForm extends JDialog {
         tabbedPane.addTab("Order Preservation", createOrderPreservationTab());
         tabbedPane.addTab("Comparison Scale Value", createComparisonScaleValueTab());
         tabbedPane.addTab("Commit Data", createSummaryTab());
-        ChangeListener changeListener = new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
-                int index = sourceTabbedPane.getSelectedIndex();
-                btnNewButton_2.setEnabled(true);
-                btnNewButton_1.setEnabled(true);
-                if (index == 0)
-                    btnNewButton_1.setEnabled(false);
+        ChangeListener changeListener = e -> {
+            JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
+            int index = sourceTabbedPane.getSelectedIndex();
+            buttonNext.setEnabled(true);
+            buttonPrevious.setEnabled(true);
+            if (index == 0)
+                buttonPrevious.setEnabled(false);
 
-                if (index == tabbedPane.getTabCount() - 1)
-                    btnNewButton_2.setEnabled(false);
-            }
+            if (index == tabbedPane.getTabCount() - 1)
+                buttonNext.setEnabled(false);
         };
         tabbedPane.addChangeListener(changeListener);
 
@@ -243,63 +243,63 @@ public class RelateForm extends JDialog {
         gbc_tabbedPane.gridy = 1;
         gbc_tabbedPane.gridwidth = 3;
         getContentPane().add(tabbedPane, gbc_tabbedPane);
-        btnNewButton_1.setEnabled(false);
+        buttonPrevious.setEnabled(false);
         setVisible(true);
     }
 
-    public static JScrollPane get_relateForm_scrollPane() {
+    public static JScrollPane getRelateFormScrollPane() {
         return RelateForm.scrollPane;
     }
 
-    public static JSlider get_relateForm_slider() {
-        return RelateForm.slider;
+//    public static JSlider getRelateFormSlider() {
+//        return RelateForm.slider;
+//    }
+
+    public static JTextField getRelateFormTextFieldLinguisticTerm() {
+        return RelateForm.textFieldLinguisticTerm;
     }
 
-    public static JTextField get_relateForm_textField_linguisticTerm() {
-        return RelateForm.textField_linguisticTerm;
+    public static JComboBox<String> getRelateFormComboBoxLinguisticTerm() {
+        return comboBoxLinguisticTerm;
     }
 
-    public static JComboBox<String> get_relateForm_comboBox_linguisticTerm() {
-        return comboBox_linguisticTerm;
+    public static JComboBox<String> getRelateFormComboBoxEntityEi() {
+        return comboBoxEntityEi;
     }
 
-    public static JComboBox<String> get_relateForm_comboBox_entityEi() {
-        return comboBox_entityEi;
+    public static JComboBox<String> getRelateFormComboBoxEntityEj() {
+        return comboBoxEntityEj;
     }
 
-    public static JComboBox<String> get_relateForm_comboBox_entityEj() {
-        return comboBox_entityEj;
+    public static JRadioButton getRelateFormRadioButtonYesEntitiesEqual() {
+        return radioButtonYesEntitiesEqual;
     }
 
-    public static JRadioButton get_relateForm_rdbtnYes_entitiesEqual() {
-        return rdbtnYes_entitiesEqual;
+    public static JRadioButton getRelateFormRadioButtonYesEntityEiGE() {
+        return radioButtonYesEntityEiGEj;
     }
 
-    public static JRadioButton get_relateForm_rdbtnYes_entityEi_g_E() {
-        return rdbtnYes_entityEi_g_Ej;
+    public static JTextField getRelateFormTextFieldRelativeWeight() {
+        return textFieldRelativeWeight;
     }
 
-    public static JTextField get_relateForm_textField_relativeWeight() {
-        return textField_relativeWeight;
+    public static JRadioButton getRelateFormRadioButtonNoEntityEiGE() {
+        return radioButtonNoEntityEiGEj;
     }
 
-    public static JRadioButton get_relateForm_rdbtnNo_entityEi_g_E() {
-        return rdbtnNo_entityEi_g_Ej;
-    }
-
-    public static JTabbedPane get_relateForm_tabbedPaneRef() {
+    public static JTabbedPane getRelateFormTabbedPaneRef() {
         return tabbedPaneRef;
     }
 
     private JPanel createInstructionsTab() {
-        JPanel p = new JPanel();
-        p.setBorder(new TitledBorder(null, "Entity Relations Instructions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        JPanel instructionTabJPanel = new JPanel();
+        instructionTabJPanel.setBorder(new TitledBorder(null, "Entity Relations Instructions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         GridBagLayout gbl_p = new GridBagLayout();
         gbl_p.columnWidths = new int[]{0};
         gbl_p.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
         gbl_p.columnWeights = new double[]{1.0};
         gbl_p.rowWeights = new double[]{1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 0.0};
-        p.setLayout(gbl_p);
+        instructionTabJPanel.setLayout(gbl_p);
 
         JLabel lblNewLabel = new JLabel("This task is to relate entities (objects or alternatives) to each other by two or four steps depending on the situation.");
         lblNewLabel.setForeground(Color.BLACK);
@@ -314,7 +314,7 @@ public class RelateForm extends JDialog {
         gbc_lblNewLabel.gridx = 0;
         gbc_lblNewLabel.gridy = 0;
         gbc_lblNewLabel.anchor = GridBagConstraints.WEST;
-        p.add(lblNewLabel, gbc_lblNewLabel);
+        instructionTabJPanel.add(lblNewLabel, gbc_lblNewLabel);
 
         JLabel lblNewLabel_2 = new JLabel("Step 1.  Specify a linguistic expression by one of two ways (a drop down list or a user text) to be used in the entire process.");
         GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
@@ -322,7 +322,7 @@ public class RelateForm extends JDialog {
         gbc_lblNewLabel_2.gridx = 0;
         gbc_lblNewLabel_2.gridy = 1;
         gbc_lblNewLabel_2.anchor = GridBagConstraints.WEST;
-        p.add(lblNewLabel_2, gbc_lblNewLabel_2);
+        instructionTabJPanel.add(lblNewLabel_2, gbc_lblNewLabel_2);
 
         JLabel lblStepSelect = new JLabel("Step 2.  Select two entities to compare.");
         GridBagConstraints gbc_lblStepSelect = new GridBagConstraints();
@@ -330,7 +330,7 @@ public class RelateForm extends JDialog {
         gbc_lblStepSelect.gridx = 0;
         gbc_lblStepSelect.gridy = 2;
         gbc_lblStepSelect.anchor = GridBagConstraints.WEST;
-        p.add(lblStepSelect, gbc_lblStepSelect);
+        instructionTabJPanel.add(lblStepSelect, gbc_lblStepSelect);
 
         JLabel lblStepSwap = new JLabel("Step 3.  Swap entities E_i and E_j to simplify comparisons \"larger\"(or \"more important\" or as defined in Step 1) to \"smaller\".");
         GridBagConstraints gbc_lblStepSwap = new GridBagConstraints();
@@ -338,7 +338,7 @@ public class RelateForm extends JDialog {
         gbc_lblStepSwap.gridx = 0;
         gbc_lblStepSwap.gridy = 3;
         gbc_lblStepSwap.anchor = GridBagConstraints.WEST;
-        p.add(lblStepSwap, gbc_lblStepSwap);
+        instructionTabJPanel.add(lblStepSwap, gbc_lblStepSwap);
 
         JLabel lblEqualityOfEntities = new JLabel("Equality of entities will terminate further data entry.");
         GridBagConstraints gbc_lblEqualityOfEntities = new GridBagConstraints();
@@ -346,7 +346,7 @@ public class RelateForm extends JDialog {
         gbc_lblEqualityOfEntities.gridx = 0;
         gbc_lblEqualityOfEntities.gridy = 4;
         gbc_lblEqualityOfEntities.anchor = GridBagConstraints.WEST;
-        p.add(lblEqualityOfEntities, gbc_lblEqualityOfEntities);
+        instructionTabJPanel.add(lblEqualityOfEntities, gbc_lblEqualityOfEntities);
 
         JLabel lblStepEnter = new JLabel("Step 4.  Enter the value via slider or enter manually as number from a scale 1 to [User Defined Upper Bound]");
         GridBagConstraints gbc_lblStepEnter = new GridBagConstraints();
@@ -354,7 +354,7 @@ public class RelateForm extends JDialog {
         gbc_lblStepEnter.gridx = 0;
         gbc_lblStepEnter.gridy = 5;
         gbc_lblStepEnter.anchor = GridBagConstraints.WEST;
-        p.add(lblStepEnter, gbc_lblStepEnter);
+        instructionTabJPanel.add(lblStepEnter, gbc_lblStepEnter);
 
         JLabel lblSepSubmit = new JLabel("Step 5.  Commit comparison data For E_i and E_j.  Repeat Step 2. through Step 4. until all entities are compared.");
         GridBagConstraints gbc_lblSepSubmit = new GridBagConstraints();
@@ -362,7 +362,7 @@ public class RelateForm extends JDialog {
         gbc_lblSepSubmit.gridx = 0;
         gbc_lblSepSubmit.gridy = 6;
         gbc_lblSepSubmit.anchor = GridBagConstraints.WEST;
-        p.add(lblSepSubmit, gbc_lblSepSubmit);
+        instructionTabJPanel.add(lblSepSubmit, gbc_lblSepSubmit);
 
         JLabel lblStepReview = new JLabel("Step 6.  Commit all data, or select on error and reprocess until data is accepted.");
         GridBagConstraints gbc_lblStepReview = new GridBagConstraints();
@@ -370,9 +370,9 @@ public class RelateForm extends JDialog {
         gbc_lblStepReview.gridy = 7;
         gbc_lblStepReview.insets = new Insets(0, 0, 5, 0);
         gbc_lblStepReview.anchor = GridBagConstraints.WEST;
-        p.add(lblStepReview, gbc_lblStepReview);
+        instructionTabJPanel.add(lblStepReview, gbc_lblStepReview);
 
-        return p;
+        return instructionTabJPanel;
     }
 
     private JPanel createEntitiesToCompareTab() {
@@ -408,12 +408,10 @@ public class RelateForm extends JDialog {
         gbc_lblEntityA.anchor = GridBagConstraints.EAST;
         panel.add(lblEntityA, gbc_lblEntityA);
 
-        comboBox_entityEi = new JComboBox<String>();
-        comboBox_entityEi.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    rfd.addChildListToEjGivenEi(comboBox_entityEi.getSelectedIndex());
-                }
+        comboBoxEntityEi = new JComboBox<>();
+        comboBoxEntityEi.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                relateFormDomain.addChildListToEjGivenEi(comboBoxEntityEi.getSelectedIndex());
             }
         });
         GridBagConstraints gbc_comboBox_entityEi = new GridBagConstraints();
@@ -421,7 +419,7 @@ public class RelateForm extends JDialog {
         gbc_comboBox_entityEi.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox_entityEi.gridx = 1;
         gbc_comboBox_entityEi.gridy = 1;
-        panel.add(comboBox_entityEi, gbc_comboBox_entityEi);
+        panel.add(comboBoxEntityEi, gbc_comboBox_entityEi);
 
         JLabel lblEntityB = new JLabel("Entity E_j:");
         GridBagConstraints gbc_lblEntityB = new GridBagConstraints();
@@ -431,12 +429,10 @@ public class RelateForm extends JDialog {
         gbc_lblEntityB.gridy = 1;
         panel.add(lblEntityB, gbc_lblEntityB);
 
-        comboBox_entityEj = new JComboBox<String>();
-        comboBox_entityEj.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    rfd.setLocalDomainDataForDataBondComponents(comboBox_entityEi.getSelectedIndex(), comboBox_entityEj.getSelectedIndex());
-                }
+        comboBoxEntityEj = new JComboBox<>();
+        comboBoxEntityEj.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                relateFormDomain.setLocalDomainDataForDataBondComponents(comboBoxEntityEi.getSelectedIndex(), comboBoxEntityEj.getSelectedIndex());
             }
         });
         GridBagConstraints gbc_comboBox_entityEj = new GridBagConstraints();
@@ -444,14 +440,14 @@ public class RelateForm extends JDialog {
         gbc_comboBox_entityEj.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox_entityEj.gridx = 3;
         gbc_comboBox_entityEj.gridy = 1;
-        panel.add(comboBox_entityEj, gbc_comboBox_entityEj);
+        panel.add(comboBoxEntityEj, gbc_comboBox_entityEj);
 
         return panel;
     }
 
     private JPanel createOrderPreservationTab() {
         JPanel panel_7 = new JPanel();
-        panel_7.setBorder(new TitledBorder(null, "Order Preservation", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        panel_7.setBorder(new TitledBorder(null, ORDER_PRESERVATION, TitledBorder.LEADING, TitledBorder.TOP, null, null));
         GridBagConstraints gbc_panel_7 = new GridBagConstraints();
         gbc_panel_7.insets = new Insets(0, 0, 5, 0);
         gbc_panel_7.fill = GridBagConstraints.BOTH;
@@ -504,14 +500,12 @@ public class RelateForm extends JDialog {
         gbl_panel_4.rowWeights = new double[]{1.0};
         panel_4.setLayout(gbl_panel_4);
 
-        rdbtnYes_entitiesEqual = new JRadioButton("Yes");
-        rdbtnYes_entitiesEqual.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (rfd.shortCircuitEqualEntities()) {
-                    tabbedPaneRef.setSelectedIndex(4);
-                    comboBox_entityEi.setSelectedIndex(0);
-                    comboBox_entityEj.setSelectedIndex(0);
-                }
+        radioButtonYesEntitiesEqual = new JRadioButton("Yes");
+        radioButtonYesEntitiesEqual.addActionListener(e -> {
+            if (relateFormDomain.shortCircuitEqualEntities()) {
+                tabbedPaneRef.setSelectedIndex(4);
+                comboBoxEntityEi.setSelectedIndex(0);
+                comboBoxEntityEj.setSelectedIndex(0);
             }
         });
 
@@ -519,7 +513,7 @@ public class RelateForm extends JDialog {
         gbc_rdbtnYes_entitiesEqual.insets = new Insets(0, 0, 0, 5);
         gbc_rdbtnYes_entitiesEqual.gridx = 0;
         gbc_rdbtnYes_entitiesEqual.gridy = 0;
-        panel_4.add(rdbtnYes_entitiesEqual, gbc_rdbtnYes_entitiesEqual);
+        panel_4.add(radioButtonYesEntitiesEqual, gbc_rdbtnYes_entitiesEqual);
 
         JLabel lblEiEj = new JLabel("E_i  >  E_j   ?");
         GridBagConstraints gbc_lblEiEj = new GridBagConstraints();
@@ -545,22 +539,22 @@ public class RelateForm extends JDialog {
 
         ButtonGroup bg = new ButtonGroup();
 
-        rdbtnYes_entityEi_g_Ej = new JRadioButton("Yes");
+        radioButtonYesEntityEiGEj = new JRadioButton("Yes");
         GridBagConstraints gbc_rdbtnYes_entityEi_g_Ej = new GridBagConstraints();
         gbc_rdbtnYes_entityEi_g_Ej.insets = new Insets(0, 0, 0, 5);
         gbc_rdbtnYes_entityEi_g_Ej.gridx = 0;
         gbc_rdbtnYes_entityEi_g_Ej.gridy = 0;
-        panel_8.add(rdbtnYes_entityEi_g_Ej, gbc_rdbtnYes_entityEi_g_Ej);
+        panel_8.add(radioButtonYesEntityEiGEj, gbc_rdbtnYes_entityEi_g_Ej);
 
-        bg.add(rdbtnYes_entitiesEqual);
-        bg.add(rdbtnYes_entityEi_g_Ej);
+        bg.add(radioButtonYesEntitiesEqual);
+        bg.add(radioButtonYesEntityEiGEj);
 
-        rdbtnNo_entityEi_g_Ej = new JRadioButton("No");
+        radioButtonNoEntityEiGEj = new JRadioButton("No");
         GridBagConstraints gbc_rdbtnNewRadioButton = new GridBagConstraints();
         gbc_rdbtnNewRadioButton.gridx = 1;
         gbc_rdbtnNewRadioButton.gridy = 0;
-        panel_8.add(rdbtnNo_entityEi_g_Ej, gbc_rdbtnNewRadioButton);
-        bg.add(rdbtnNo_entityEi_g_Ej);
+        panel_8.add(radioButtonNoEntityEiGEj, gbc_rdbtnNewRadioButton);
+        bg.add(radioButtonNoEntityEiGEj);
         return panel_7;
     }
 
@@ -606,14 +600,14 @@ public class RelateForm extends JDialog {
         gbc_lblSubmittingValue.anchor = GridBagConstraints.EAST;
         panel_2.add(lblSubmittingValue, gbc_lblSubmittingValue);
 
-        textField_relativeWeight = new JTextField();
+        textFieldRelativeWeight = new JTextField();
         GridBagConstraints gbc_textField_relativeWeight = new GridBagConstraints();
         gbc_textField_relativeWeight.insets = new Insets(0, 0, 5, 5);
         gbc_textField_relativeWeight.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField_relativeWeight.gridx = 1;
         gbc_textField_relativeWeight.gridy = 2;
-        panel_2.add(textField_relativeWeight, gbc_textField_relativeWeight);
-        textField_relativeWeight.setColumns(10);
+        panel_2.add(textFieldRelativeWeight, gbc_textField_relativeWeight);
+        textFieldRelativeWeight.setColumns(10);
 
         JPanel panel_3 = new JPanel();
         GridBagConstraints gbc_panel_3 = new GridBagConstraints();
@@ -632,13 +626,11 @@ public class RelateForm extends JDialog {
         panel_3.add(slider);
 
         JButton btnNewButton = new JButton(">");
-        btnNewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-				/*
-				if(slider.getValue()+2<=slider.getMaximum())
-					rfd.setSliderPosition(slider.getValue()+2);
-				*/
-            }
+        btnNewButton.addActionListener(e -> {
+            /*
+            if(slider.getValue()+2<=slider.getMaximum())
+                rfd.setSliderPosition(slider.getValue()+2);
+            */
         });
         GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
         gbc_btnNewButton.anchor = GridBagConstraints.WEST;
@@ -648,13 +640,11 @@ public class RelateForm extends JDialog {
         panel_2.add(btnNewButton, gbc_btnNewButton);
 
         JButton button = new JButton(">>");
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-				/*
-				if(slider.getValue()+1<=slider.getMaximum())
-					rfd.setSliderPosition(slider.getValue()+1);
-				*/
-            }
+        button.addActionListener(e -> {
+            /*
+            if(slider.getValue()+1<=slider.getMaximum())
+                rfd.setSliderPosition(slider.getValue()+1);
+            */
         });
         GridBagConstraints gbc_button = new GridBagConstraints();
         gbc_button.anchor = GridBagConstraints.WEST;
@@ -664,11 +654,9 @@ public class RelateForm extends JDialog {
         panel_2.add(button, gbc_button);
 
         JButton btnSubmitEiAnd = new JButton("Commit Comparison Data");
-        btnSubmitEiAnd.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (rfd.commitComparisonDataToCommitTable())
-                    tabbedPaneRef.setSelectedIndex(4);
-            }
+        btnSubmitEiAnd.addActionListener(e -> {
+            if (relateFormDomain.commitComparisonDataToCommitTable())
+                tabbedPaneRef.setSelectedIndex(4);
         });
         GridBagConstraints gbc_btnSubmitEiAnd = new GridBagConstraints();
         gbc_btnSubmitEiAnd.insets = new Insets(0, 0, 5, 0);
@@ -707,25 +695,19 @@ public class RelateForm extends JDialog {
         gbc_table.fill = GridBagConstraints.BOTH;
         panel.add(scrollPane, gbc_table);
 
-        JButton btnSubmittAllData = new JButton("Committ All Data");
-        btnSubmittAllData.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                rfd.commitDataToParent();
-                dispose();
-            }
+        JButton buttonSubmitAllData = new JButton("Committ All Data");
+        buttonSubmitAllData.addActionListener(e -> {
+            relateFormDomain.commitDataToParent();
+            dispose();
         });
-        GridBagConstraints gbc_btnSubmittAllData = new GridBagConstraints();
-        gbc_btnSubmittAllData.gridx = 2;
-        gbc_btnSubmittAllData.gridy = 2;
-        gbc_btnSubmittAllData.anchor = GridBagConstraints.EAST;
-        panel.add(btnSubmittAllData, gbc_btnSubmittAllData);
+        GridBagConstraints gbcBtnSubmitAllData = new GridBagConstraints();
+        gbcBtnSubmitAllData.gridx = 2;
+        gbcBtnSubmitAllData.gridy = 2;
+        gbcBtnSubmitAllData.anchor = GridBagConstraints.EAST;
+        panel.add(buttonSubmitAllData, gbcBtnSubmitAllData);
 
         JButton btn_nextComparison = new JButton("Next Comparison");
-        btn_nextComparison.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tabbedPaneRef.setSelectedIndex(1);
-            }
-        });
+        btn_nextComparison.addActionListener(e -> tabbedPaneRef.setSelectedIndex(1));
         GridBagConstraints gbc_nextComparison = new GridBagConstraints();
         gbc_nextComparison.gridx = 1;
         gbc_nextComparison.gridy = 2;

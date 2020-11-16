@@ -1,4 +1,4 @@
-package ca.laurentian.concluder.EntityRelations;
+package ca.laurentian.concluder.entityRelations;
 
 //This code in parts was adopted and modified to suit.  Tyler D. Jessup
 //Structure used as a template
@@ -14,51 +14,37 @@ public class CommitTableModel extends DefaultTableModel {
         super(data, columnHeaders);
     }
 
+    @Override
     public int getRowCount() {
         return super.getDataVector().size();
     }
 
+    @Override
     public int getColumnCount() {
         return super.getColumnCount();
     }
 
+    @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public Class getColumnClass(int columnIndex) {
         switch (columnIndex) {
-            case 0: {
-                return String.class;
-            }
-            case 1: {
-                return String.class;
-            }
-            case 2: {
-                return String.class;
-            }
-            case 3: {
+            case 3, 4, 5, 6 -> {
                 return boolean.class;
             }
-            case 4: {
-                return boolean.class;
-            }
-            case 5: {
-                return boolean.class;
-            }
-            case 6: {
-                return boolean.class;
-            }
-            case 7: {
+            case 7 -> {
                 return double.class;
             }
-            default: {
+            default -> {
                 return String.class;
             }
         }
     }
 
+    @Override
     public String getColumnName(int columnIndex) {
         return super.getColumnName(columnIndex);
     }
@@ -74,6 +60,7 @@ public class CommitTableModel extends DefaultTableModel {
             super.setValueAt(aValue, rowIndex, columnIndex);
             fireTableCellUpdated(rowIndex, columnIndex);
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

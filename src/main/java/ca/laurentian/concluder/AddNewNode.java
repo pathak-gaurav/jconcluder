@@ -5,10 +5,11 @@ import ca.laurentian.concluder.refactorState.Weight_Reevaluator;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
-public class addNewNode {
-    public addNewNode(Graph graph, Node source, String name, String desc, JFrame frame, int viewMode) {
+public class AddNewNode {
+
+    public AddNewNode(Graph graph, Node source, String name, String desc, JFrame frame, int viewMode) {
         //the new node that is requested to be added to the graph
         //no edge to parent, isolated
         Node newNode = graph.addNode();
@@ -20,7 +21,6 @@ public class addNewNode {
         int childCount = source.getChildCount();
         //trivial case of single node add
         if (childCount == 0) {
-            System.out.println("XXX");
             newNode.set("weight", source.get("weight"));
             newNode.set("weight2", 100.0);
             source.set("rel", "Single Child");
@@ -41,7 +41,7 @@ public class addNewNode {
 
                 //all upper triangular relative weights
                 //this is the generic form that catches all cases of nxn >2
-                String[] relativeWeights = ((String) source.getString("rel")).split(" ");
+                String[] relativeWeights = source.getString("rel").split(" ");
 
                 //computes theoretical size n of nxn PC matrix of the comparison count
                 int numberOfComparisons = relativeWeights.length;
@@ -57,18 +57,20 @@ public class addNewNode {
                 squareSizeOfPCMatrix++;
 
                 //creates new composite string with added node, all weights 1 of new node
-                String newCompositeRelativeWeightString = "";
+                String newCompositeRelativeWeightString;
 
                 int k = 0;
+                StringBuilder newCompositeRelativeWeightStringBuilder = new StringBuilder();
                 for (int i = squareSizeOfPCMatrix; i > 0; i--) {
                     for (int j = 0; j < i - 1; j++) {
                         //include existing weights
-                        newCompositeRelativeWeightString += relativeWeights[k] + " ";
+                        newCompositeRelativeWeightStringBuilder.append(relativeWeights[k]).append(" ");
                         k++;
                     }
                     //add the new node weight of 1
-                    newCompositeRelativeWeightString += "1 ";
+                    newCompositeRelativeWeightStringBuilder.append("1 ");
                 }
+                newCompositeRelativeWeightString = newCompositeRelativeWeightStringBuilder.toString();
                 newCompositeRelativeWeightString = newCompositeRelativeWeightString.substring(0, newCompositeRelativeWeightString.length() - 1);
                 source.set("rel", newCompositeRelativeWeightString);
             }
@@ -77,7 +79,7 @@ public class addNewNode {
             //changes are maintained through relate
             else {
                 //hack against string format for upper triangle
-                source.set("rel", ((String) source.get(3)) + " 1 1");
+                source.set("rel", source.get(3) + " 1 1");
             }
             //since a node is added, normailze and add new node
             Weight_Reevaluator wre = new Weight_Reevaluator(source, newNode, viewMode);

@@ -2,46 +2,57 @@ package ca.laurentian.concluder;
 
 import ca.laurentian.concluder.refactorState.PCTableModel;
 import ca.laurentian.concluder.refactorState.RXTable;
-import ca.laurentian.concluder.refactorState.SystemConfiguration;
 import ca.laurentian.concluder.refactorState.View_Mode_Administrator;
 import ca.laurentian.concluder.refactorState.Weight_Redistributor;
 import ca.laurentian.concluder.refactorState.Weight_Reevaluator;
 import prefuse.data.Graph;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-class inconsistency extends JFrame implements ActionListener {
+import static ca.laurentian.concluder.refactorState.SystemConfiguration.*;
+import static javax.swing.JLabel.*;
+
+class Inconsistency extends JFrame implements ActionListener {
     //i,j,k for the current highlighted triad{aij,aik,akj}
-    static int highlighted_i, highlighted_j, highlighted_k;
+    static int highlightedI;
+    static int highlightedJ;
+    static int highlightedK;
 
     //count how many times button "next_inconsistency" has been clicked by user
-    int button_nextinconsistency_Counter = 0;
+    int buttonNextInconsistencyCounter = 0;
 
     //the number of the child nodes of the selected node
-    int ChildNumber = 0;
+    int childNumber;
 
     //new an array to store all inconsistency values of the PC matrix
-    double inconsistency[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    double[] inconsistency = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     //new UI components
-    JButton button_ok = new JButton();
-    JButton button_maxinconsistency = new JButton();
-    JButton button_nextinconsistency = new JButton();
-    JButton button_reduceinconsistency = new JButton();
-    JButton button_reduceTriadinconsistency = new JButton();
-    JButton button_locateElement = new JButton();
-    JLabel label_maxinconsistency = new JLabel();
-    JLabel label_reduceinconsistency = new JLabel();
+    JButton buttonOk = new JButton();
+    JButton buttonMaxInconsistency = new JButton();
+    JButton buttonNextInconsistency = new JButton();
+    JButton buttonReduceInconsistency = new JButton();
+    JButton buttonReduceTriadInconsistency = new JButton();
+    JButton buttonLocateElement = new JButton();
+    JLabel labelMaxInconsistency = new JLabel();
+    JLabel labelReduceInconsistency = new JLabel();
 
     //new a matrix to store the PC matrix in the form of string
-    String cellValue[][] = {
+    String[][] cellValue = {
             {"", "", "", "", "", "", ""},
             {"", "", "", "", "", "", ""},
             {"", "", "", "", "", "", ""},
@@ -64,26 +75,25 @@ class inconsistency extends JFrame implements ActionListener {
             };
 
     //new a matrix to store those elements with the same value of inconsistency
-    int same_inconsistency_triad[][] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+    int[][] sameInconsistencyTriad = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
     //the number of triple elements group with the same value of inconsistency
     int samecount = 0;
     String[] columns = {"", "", "", "", "", "", ""};
     int num = 0;
     Graph graph;
     File file;
-    int Ananode;//the selected parent node
+    int ananode;//the selected parent node
     JFrame frame = new JFrame();
     RXTable table;
     //DefaultTableModel model = new DefaultTableModel(cells, columns);
     JScrollPane scroll = new JScrollPane();
-    private int viewMode;
+    private final int viewMode;
 
-    @SuppressWarnings("deprecation")
-    public inconsistency(String childweight[], String relation, Graph g, File f, int A, int viewMode) {
+    public Inconsistency(String[] childWeight, String relation, Graph g, File f, int A, int viewMode) {
         this.viewMode = viewMode;
         graph = g;
         file = f;
-        Ananode = A;
+        ananode = A;
         frame.setSize(530, 570);
         frame.setTitle("Inconsistency analysis");
         frame.setBackground(Color.lightGray);
@@ -97,11 +107,11 @@ class inconsistency extends JFrame implements ActionListener {
         table = new RXTable(model);
         table.setSelectAllForEdit(true);
         table.setRowHeight(57);
-        table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setCellSelectionEnabled(false);
 
         DefaultTableCellRenderer r = new DefaultTableCellRenderer();
-        r.setHorizontalAlignment(JLabel.CENTER);
+        r.setHorizontalAlignment(CENTER);
         table.setDefaultRenderer(Object.class, r);
 
         javax.swing.table.TableColumnModel tcm = table.getColumnModel();
@@ -112,30 +122,30 @@ class inconsistency extends JFrame implements ActionListener {
         }
         scroll.getViewport().add(table);
         scroll.setBounds(10, 10, 100, 100);
-        label_maxinconsistency.setText("Inconsistency:                      ");
-        button_ok.setText("Ok");
-        button_ok.addActionListener(this);
-        button_maxinconsistency.setText("Maximal inconsistency");
-        button_maxinconsistency.addActionListener(this);
-        button_nextinconsistency.setText(">");
-        button_nextinconsistency.addActionListener(this);
-        label_reduceinconsistency.setText("Reduce inconsistency by:  ");
-        button_reduceinconsistency.setText("BAL");
-        button_reduceinconsistency.addActionListener(this);
-        button_reduceTriadinconsistency.setText("Triad");
-        button_reduceTriadinconsistency.addActionListener(this);
-        button_locateElement.setText("Most inconsistent element");
-        button_locateElement.addActionListener(this);
+        labelMaxInconsistency.setText("Inconsistency:                      ");
+        buttonOk.setText("Ok");
+        buttonOk.addActionListener(this);
+        buttonMaxInconsistency.setText("Maximal inconsistency");
+        buttonMaxInconsistency.addActionListener(this);
+        buttonNextInconsistency.setText(">");
+        buttonNextInconsistency.addActionListener(this);
+        labelReduceInconsistency.setText("Reduce inconsistency by:  ");
+        buttonReduceInconsistency.setText("BAL");
+        buttonReduceInconsistency.addActionListener(this);
+        buttonReduceTriadInconsistency.setText("Triad");
+        buttonReduceTriadInconsistency.addActionListener(this);
+        buttonLocateElement.setText("Most inconsistent element");
+        buttonLocateElement.addActionListener(this);
         table.getModel().addTableModelListener(new TableModelListener1());
         p1.add(scroll);
-        p2.add(label_maxinconsistency);
-        p2.add(button_maxinconsistency);
-        p2.add(button_nextinconsistency);
-        p2.add(label_reduceinconsistency);
-        p2.add(button_reduceinconsistency);
-        p2.add(button_reduceTriadinconsistency);
-        p2.add(button_locateElement);
-        p3.add(button_ok);
+        p2.add(labelMaxInconsistency);
+        p2.add(buttonMaxInconsistency);
+        p2.add(buttonNextInconsistency);
+        p2.add(labelReduceInconsistency);
+        p2.add(buttonReduceInconsistency);
+        p2.add(buttonReduceTriadInconsistency);
+        p2.add(buttonLocateElement);
+        p3.add(buttonOk);
         p2.setLayout(new FlowLayout(FlowLayout.LEFT));
         p1.setBounds(10, 10, 100, 100);
         p2.setBounds(10, 100, 100, 130);
@@ -144,14 +154,14 @@ class inconsistency extends JFrame implements ActionListener {
         frame.add(p3, BorderLayout.SOUTH);
         frame.setVisible(true);
 
-        String relation2[] = relation.split(" ");
+        String[] relation2 = relation.split(" ");
         int n = 0;
         //put the relations of criteria into the PC matrix
         if (relation2.length == 3)//3 by 3 pc matrix
         {
             for (int i = 0; i < 2; i++) {
                 for (int j = i + 1; j < 3; j++) {
-                    cellValue[i][j] = SystemConfiguration.formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
+                    cellValue[i][j] = formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
                     n++;
                 }
 
@@ -161,7 +171,7 @@ class inconsistency extends JFrame implements ActionListener {
         {
             for (int i = 0; i < 3; i++) {
                 for (int j = i + 1; j < 4; j++) {
-                    cellValue[i][j] = SystemConfiguration.formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
+                    cellValue[i][j] = formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
                     n++;
                 }
 
@@ -171,7 +181,7 @@ class inconsistency extends JFrame implements ActionListener {
         {
             for (int i = 0; i < 4; i++) {
                 for (int j = i + 1; j < 5; j++) {
-                    cellValue[i][j] = SystemConfiguration.formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
+                    cellValue[i][j] = formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
                     n++;
                 }
 
@@ -181,7 +191,7 @@ class inconsistency extends JFrame implements ActionListener {
         {
             for (int i = 0; i < 5; i++) {
                 for (int j = i + 1; j < 6; j++) {
-                    cellValue[i][j] = SystemConfiguration.formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
+                    cellValue[i][j] = formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
                     n++;
                 }
 
@@ -191,7 +201,7 @@ class inconsistency extends JFrame implements ActionListener {
         {
             for (int i = 0; i < 6; i++) {
                 for (int j = i + 1; j < 7; j++) {
-                    cellValue[i][j] = SystemConfiguration.formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
+                    cellValue[i][j] = formatNumber(Double.parseDouble(String.valueOf(relation2[n])));
                     n++;
                 }
 
@@ -199,30 +209,31 @@ class inconsistency extends JFrame implements ActionListener {
 
         }
 
-        for (ChildNumber = 0; ChildNumber < childweight.length; ChildNumber++) {
-            if (childweight[ChildNumber] == "")
+        for (childNumber = 0; childNumber < childWeight.length; childNumber++) {
+            if (childWeight[childNumber].equals(""))
                 break;
         }
-        for (int row = 0; row < ChildNumber; row++) {
-            for (int column = 0; column < ChildNumber; column++) {
+        for (int row = 0; row < childNumber; row++) {
+            for (int column = 0; column < childNumber; column++) {
                 //table.setValueAt(cellValue[row][column], row, column);
-                if ((cellValue[row][column] != "") && (column >= row))//fill up the lower triangle part of the pc matrix
+                if ((!cellValue[row][column].equals("")) && (column >= row))//fill up the lower triangle part of the pc matrix
                 {
                     //table.setValueAt("1/"+cellValue[row][column], column, row);
                     try {
-                        table.setValueAt(SystemConfiguration.formatNumber(Double.parseDouble("" + 1 / SystemConfiguration.unformatNumberString(cellValue[row][column]))), column, row);
+                        table.setValueAt(formatNumber(Double.parseDouble("" + 1 / unformatNumberString(cellValue[row][column]))), column, row);
                     } catch (Exception e1) {
+                        e1.printStackTrace();
                     }
                 }
             }
         }
-        for (int i = 0; i < ChildNumber; i++) {
+        for (int i = 0; i < childNumber; i++) {
             table.setValueAt("1", i, i);//display 1 in the diagonal of the table
         }
     }
 
     //sort an array
-    public static void sort(double data[]) {
+    public static void sort(double[] data) {
         for (int j = 1; j <= data.length; j++) {
             for (int i = 0; i < data.length - 1; i++) {
                 if (data[i] < data[i + 1]) {
@@ -235,26 +246,24 @@ class inconsistency extends JFrame implements ActionListener {
         }
     }
 
-    public double Min(double a, double b)//find the smaller one between a and b
+    public double min(double a, double b)//find the smaller one between a and b
     {
-        if (a >= b) {
-            return b;
-        } else {
-            return a;
-        }
+        return Math.min(a, b);
     }
 
     //compute inconsistency of a triad
-    public void ComIncon(String cellValue1[][]) throws Exception {
+    public void computeInconsistency(String[][] cellValue1) throws Exception {
         num = 0;
         for (int i = 0; i < 5; i++) {
             for (int k = i + 1; k < 6; k++) {
                 for (int j = k + 1; j < 7; j++) {
-                    if ((cellValue1[i][j] != "") && (cellValue1[i][k] != "") && (cellValue1[k][j] != "")) {
-                        double a = SystemConfiguration.unformatNumberString(cellValue1[i][j]);//obtain value from the matrix
-                        double b = SystemConfiguration.unformatNumberString(cellValue1[i][k]);//obtain value from the matrix
-                        double c = SystemConfiguration.unformatNumberString(cellValue1[k][j]);//obtain value from the matrix
-                        inconsistency[num] = (int) Math.round(Min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f;//calculate the inconsistency value and store in the inconsistency array
+                    if ((!cellValue1[i][j].equals("")) && (!cellValue1[i][k].equals("")) && (!cellValue1[k][j].equals(
+                            ""))) {
+                        double a = unformatNumberString(cellValue1[i][j]);//obtain value from the matrix
+                        double b = unformatNumberString(cellValue1[i][k]);//obtain value from the matrix
+                        double c = unformatNumberString(cellValue1[k][j]);//obtain value from the matrix
+                        inconsistency[num] = (int) Math.round(
+                                min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f;//calculate the inconsistency value and store in the inconsistency array
                         num++;
                     }
                 }
@@ -264,20 +273,21 @@ class inconsistency extends JFrame implements ActionListener {
     }
 
     //display the triad with maximal inconsistency
-    public void showmaxincon(String cellValue1[][]) throws Exception {
-        label_maxinconsistency.setText("Inconsistency: " + String.valueOf(inconsistency[0]) + "             ");//display the first element which is the largest number of the inconsistency matrix
+    public void showMaxInconsistency(String[][] cellValue1) throws Exception {
+        labelMaxInconsistency.setText("Inconsistency: " + inconsistency[0] + "             ");//display the first element which is the largest number of the inconsistency matrix
         for (int i = 0; i < 5; i++) {
             for (int k = i + 1; k < 6; k++) {
                 for (int j = k + 1; j < 7; j++) {
-                    if ((cellValue1[i][j] != "") && (cellValue1[i][k] != "") && (cellValue1[k][j] != "")) {
-                        double a = SystemConfiguration.unformatNumberString(cellValue1[i][j]);//obtain value from the matrix
-                        double b = SystemConfiguration.unformatNumberString(cellValue1[i][k]);//obtain value from the matrix
-                        double c = SystemConfiguration.unformatNumberString(cellValue1[k][j]);//obtain value from the matrix
-                        if (inconsistency[0] == (int) Math.round(Min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f)//find the triple elements with the largest inconsistency
+                    if ((!cellValue1[i][j].equals("")) && (!cellValue1[i][k].equals("")) && (!cellValue1[k][j].equals(""))) {
+                        double a = unformatNumberString(cellValue1[i][j]);//obtain value from the matrix
+                        double b = unformatNumberString(cellValue1[i][k]);//obtain value from the matrix
+                        double c = unformatNumberString(cellValue1[k][j]);//obtain value from the matrix
+                        if (inconsistency[0] == (int) Math.round(
+                                min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f)//find the triple elements with the largest inconsistency
                         {
-                            highlighted_i = i;
-                            highlighted_j = j;
-                            highlighted_k = k;
+                            highlightedI = i;
+                            highlightedJ = j;
+                            highlightedK = k;
                             table.setDefaultRenderer(Object.class, new EvenOddRenderer());    //highlight the triple elements
                         }
                     }
@@ -291,90 +301,90 @@ class inconsistency extends JFrame implements ActionListener {
         try {
             handler(e);
         } catch (Exception e2) {
+            e2.printStackTrace();
         }
     }
 
     private void handler(ActionEvent e) throws Exception {
-        if (e.getSource() == button_ok)//apply the changes in pc matrix
+        if (e.getSource() == buttonOk)//apply the changes in pc matrix
         {
             int acount = 0;
             for (int i = 0; i < cellValue.length; i++) {
-                if ((cellValue[0][i] != ""))
+                if ((!cellValue[0][i].equals("")))
                     acount++;
             }
-            String relation = "";
+            StringBuilder relation = new StringBuilder();
             for (int i = 0; i < acount; i++) {
                 for (int j = i + 1; j < acount; j++) {
-                    relation = relation + SystemConfiguration.unformatNumberString(cellValue[i][j]) + " ";
+                    relation.append(unformatNumberString(cellValue[i][j])).append(" ");
                 }
             }
-            graph.getNode(Ananode).set(3, relation);
+            graph.getNode(ananode).set(3, relation.toString());
             if (file != null) {
-                int childnumber = graph.getNode(Ananode).getChildCount();
-                Weight_Reevaluator we = new Weight_Reevaluator(graph.getNode(Ananode), null, viewMode);
+                int childnumber = graph.getNode(ananode).getChildCount();
+                Weight_Reevaluator we = new Weight_Reevaluator(graph.getNode(ananode), null, viewMode);
                 we.reevaluate();
                 for (int i = 0; i < childnumber; i++) {
                     Weight_Redistributor rw = new Weight_Redistributor(viewMode);
-                    rw.Redistribute_From_Root(graph.getNode(Ananode).getChild(i));
+                    rw.Redistribute_From_Root(graph.getNode(ananode).getChild(i));
                 }
                 new View_Mode_Administrator(viewMode, graph);
-                frame.setVisible(false);
-                frame.dispose();
-            } else {
-                frame.setVisible(false);
-                frame.dispose();
             }
-        } else if (e.getSource() == button_maxinconsistency)//display the triad with the maximal inconsistency
+            frame.setVisible(false);
+            frame.dispose();
+        } else if (e.getSource() == buttonMaxInconsistency)//display the triad with the maximal inconsistency
         {
-            ComIncon(cellValue);//compute the inconsistency
-            showmaxincon(cellValue);//display the triad with maximal inconsistency
-        } else if (e.getSource() == button_nextinconsistency)//display the next triad by decending inconsistency order
+            computeInconsistency(cellValue);//compute the inconsistency
+            showMaxInconsistency(cellValue);//display the triad with maximal inconsistency
+        } else if (e.getSource() == buttonNextInconsistency)//display the next triad by decending inconsistency order
         {
-            if (button_nextinconsistency_Counter > num - 1)//the number user clicked the next button beyond the total number of the inconsistency value
+            if (buttonNextInconsistencyCounter > num - 1)//the number user clicked the next button beyond the total number of the inconsistency value
             {
-                button_nextinconsistency_Counter = 0;//go back to the first element of the inconsistency array
+                buttonNextInconsistencyCounter = 0;//go back to the first element of the inconsistency array
                 for (int i = 0; i < 10; i++) {
                     for (int j = 0; j < 3; j++) {
-                        same_inconsistency_triad[i][j] = 0;
+                        sameInconsistencyTriad[i][j] = 0;
                     }
                 }
                 samecount = 0;
-            } else if (button_nextinconsistency_Counter == 0)//it's the first time for user to click next button
+            } else if (buttonNextInconsistencyCounter == 0)//it's the first time for user to click next button
             {
                 for (int i = 0; i < 10; i++) {
                     for (int j = 0; j < 3; j++) {
-                        same_inconsistency_triad[i][j] = 0;
+                        sameInconsistencyTriad[i][j] = 0;
                     }
                 }
                 samecount = 0;
             }
-            label_maxinconsistency.setText("inconsistency: " + String.valueOf(inconsistency[button_nextinconsistency_Counter]) + "             ");//display inconsistency value
+            labelMaxInconsistency.setText("inconsistency: " + inconsistency[buttonNextInconsistencyCounter] + "             ");//display inconsistency value
             //find the triad having the specific inconsistency
             A:
             for (int i = 0; i < 5; i++) {
                 for (int k = i + 1; k < 6; k++) {
                     for (int j = k + 1; j < 7; j++) {
-                        if ((cellValue[i][j] != "") && (cellValue[i][k] != "") && (cellValue[k][j] != "")) {
+                        if ((!cellValue[i][j].equals("")) && (!cellValue[i][k].equals("")) && (!cellValue[k][j].equals(""))) {
                             int flag = 0;
-                            double a = SystemConfiguration.unformatNumberString(cellValue[i][j]);//obtain value from the matrix
-                            double b = SystemConfiguration.unformatNumberString(cellValue[i][k]);//obtain value from the matrix
-                            double c = SystemConfiguration.unformatNumberString(cellValue[k][j]);//obtain value from the matrix
-                            if (inconsistency[button_nextinconsistency_Counter] == (int) Math.round(Min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f)//find the triple elements with the same inconsistency
+                            double a = unformatNumberString(cellValue[i][j]);//obtain value from the matrix
+                            double b = unformatNumberString(cellValue[i][k]);//obtain value from the matrix
+                            double c = unformatNumberString(cellValue[k][j]);//obtain value from the matrix
+                            if (inconsistency[buttonNextInconsistencyCounter] == (int) Math.round(
+                                    min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f)//find the triple elements with the same inconsistency
                             {
                                 for (int n1 = 0; n1 < 10; n1++) {
-                                    if ((same_inconsistency_triad[n1][0] == i) & (same_inconsistency_triad[n1][1] == j) & (same_inconsistency_triad[n1][2] == k)) {
+                                    if ((sameInconsistencyTriad[n1][0] == i) && (sameInconsistencyTriad[n1][1] == j) && (
+                                            sameInconsistencyTriad[n1][2] == k)) {
                                         flag = 1;//there exists another triple elements with the same value of inconsistency
                                     }
                                 }
                                 if (flag == 0)//the inconsistency value is unique
                                 {
-                                    highlighted_i = i;
-                                    highlighted_j = j;
-                                    highlighted_k = k;
+                                    highlightedI = i;
+                                    highlightedJ = j;
+                                    highlightedK = k;
                                     table.setDefaultRenderer(Object.class, new EvenOddRenderer());//display the triple elements
-                                    same_inconsistency_triad[samecount][0] = i;//store the position of the triple elements
-                                    same_inconsistency_triad[samecount][1] = j;//store the position of the triple elements
-                                    same_inconsistency_triad[samecount][2] = k;//store the position of the triple elements
+                                    sameInconsistencyTriad[samecount][0] = i;//store the position of the triple elements
+                                    sameInconsistencyTriad[samecount][1] = j;//store the position of the triple elements
+                                    sameInconsistencyTriad[samecount][2] = k;//store the position of the triple elements
                                     samecount++;
                                     break A;
                                 }
@@ -383,8 +393,8 @@ class inconsistency extends JFrame implements ActionListener {
                     }
                 }
             }
-            button_nextinconsistency_Counter++;
-        } else if (e.getSource() == button_reduceinconsistency)//reduce inconsistency automatically according to weight-based inconsistency reduction method
+            buttonNextInconsistencyCounter++;
+        } else if (e.getSource() == buttonReduceInconsistency)//reduce inconsistency automatically according to weight-based inconsistency reduction method
         {
             int execute = 0;
             B:
@@ -393,15 +403,19 @@ class inconsistency extends JFrame implements ActionListener {
                 for (int i = 0; i < 5; i++) {
                     for (int k = i + 1; k < 6; k++) {
                         for (int j = k + 1; j < 7; j++) {
-                            if ((cellValue[i][j] != "") && (cellValue[i][k] != "") && (cellValue[k][j] != "")) {
-                                double a = SystemConfiguration.unformatNumberString(cellValue[i][j]);//obtain value from the matrix
-                                double b = SystemConfiguration.unformatNumberString(cellValue[i][k]);//obtain value from the matrix
-                                double c = SystemConfiguration.unformatNumberString(cellValue[k][j]);//obtain value from the matrix
-                                if (inconsistency[0] == (int) Math.round(Min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f)//find the triple elements with the largest inconsistency
+                            if ((!cellValue[i][j].equals("")) && (!cellValue[i][k].equals("")) && (!cellValue[k][j].equals(""))) {
+                                double a = unformatNumberString(cellValue[i][j]);//obtain value from the matrix
+                                double b = unformatNumberString(cellValue[i][k]);//obtain value from the matrix
+                                double c = unformatNumberString(cellValue[k][j]);//obtain value from the matrix
+                                if (inconsistency[0] == (int) Math.round(
+                                        min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f)//find the triple elements with the largest inconsistency
                                 {
-                                    a = (Math.pow((double) b, (double) 1 / 3) * Math.pow((double) c, (double) 1 / 3) * Math.pow((double) a, (double) 2 / 3));
-                                    b = (Math.pow((double) b, (double) 2 / 3) * Math.pow((double) c, (double) -1 / 3) * Math.pow((double) a, (double) 1 / 3));
-                                    c = (Math.pow((double) b, (double) -1 / 3) * Math.pow((double) c, (double) 2 / 3) * Math.pow((double) a, (double) 1 / 3));
+                                    a = (Math.pow(b, (double) 1 / 3) * Math.pow(c, (double) 1 / 3) * Math.pow(
+                                            a, (double) 2 / 3));
+                                    b = (Math.pow(b, (double) 2 / 3) * Math.pow(c, (double) -1 / 3) * Math.pow(
+                                            a, (double) 1 / 3));
+                                    c = (Math.pow(b, (double) -1 / 3) * Math.pow(c, (double) 2 / 3) * Math.pow(
+                                            a, (double) 1 / 3));
 									/* old incon reduce algprithm
 									if((b*c)<a)
 									{
@@ -507,38 +521,39 @@ class inconsistency extends JFrame implements ActionListener {
                                     warnWindow("No solution for triad {" + i + j + "," + i + k + "," + k + j + "}!", 400, 100);
                                     break B;
                                 } else {
-                                    table.setValueAt(String.valueOf(SystemConfiguration.formatNumber(a)), i, j);
-                                    table.setValueAt(String.valueOf(SystemConfiguration.formatNumber(b)), i, k);
-                                    table.setValueAt(String.valueOf(SystemConfiguration.formatNumber(c)), k, j);
-                                    table.setValueAt(SystemConfiguration.formatNumber(1 / Double.parseDouble(String.valueOf(a))), j, i);
-                                    table.setValueAt(SystemConfiguration.formatNumber(1 / Double.parseDouble(String.valueOf(b))), k, i);
-                                    table.setValueAt(SystemConfiguration.formatNumber(1 / Double.parseDouble(String.valueOf(c))), j, k);
+                                    table.setValueAt(String.valueOf(formatNumber(a)), i, j);
+                                    table.setValueAt(String.valueOf(formatNumber(b)), i, k);
+                                    table.setValueAt(String.valueOf(formatNumber(c)), k, j);
+                                    table.setValueAt(formatNumber(1 / Double.parseDouble(String.valueOf(a))), j, i);
+                                    table.setValueAt(formatNumber(1 / Double.parseDouble(String.valueOf(b))), k, i);
+                                    table.setValueAt(formatNumber(1 / Double.parseDouble(String.valueOf(c))), j, k);
                                 }
                             }
                         }
                     }
                 }
-                ComIncon(cellValue);
-                showmaxincon(cellValue);
+                computeInconsistency(cellValue);
+                showMaxInconsistency(cellValue);
             }
             table.setDefaultRenderer(Object.class, new EvenOddRenderer());
-        } else if (e.getSource() == button_reduceTriadinconsistency)//reduce the inconsistency of one triad by weight-based inconsistency reduction method
+        } else if (e.getSource() == buttonReduceTriadInconsistency)//reduce the inconsistency of one triad by weight-based inconsistency reduction method
         {
-            if ((cellValue[highlighted_i][highlighted_j] != "") && (cellValue[highlighted_i][highlighted_k] != "") && (cellValue[highlighted_k][highlighted_j] != "")) {
-                double a = SystemConfiguration.unformatNumberString(cellValue[highlighted_i][highlighted_j]);//obtain value from the matrix
-                double b = SystemConfiguration.unformatNumberString(cellValue[highlighted_i][highlighted_k]);//obtain value from the matrix
-                double c = SystemConfiguration.unformatNumberString(cellValue[highlighted_k][highlighted_j]);//obtain value from the matrix
+            if ((!cellValue[highlightedI][highlightedJ].equals("")) && (!cellValue[highlightedI][highlightedK].equals("")) && (!cellValue[highlightedK][highlightedJ].equals(
+                    ""))) {
+                double a = unformatNumberString(cellValue[highlightedI][highlightedJ]);//obtain value from the matrix
+                double b = unformatNumberString(cellValue[highlightedI][highlightedK]);//obtain value from the matrix
+                double c = unformatNumberString(cellValue[highlightedK][highlightedJ]);//obtain value from the matrix
 
-                double temp_a;
-                double temp_b;
-                double temp_c;
+                double tempA;
+                double tempB;
+                double tempC;
 
-                temp_a = (Math.pow((double) b, (double) 1 / 3) * Math.pow((double) c, (double) 1 / 3) * Math.pow((double) a, (double) 2 / 3));
-                temp_b = (Math.pow((double) b, (double) 2 / 3) * Math.pow((double) c, (double) -1 / 3) * Math.pow((double) a, (double) 1 / 3));
-                temp_c = (Math.pow((double) b, (double) -1 / 3) * Math.pow((double) c, (double) 2 / 3) * Math.pow((double) a, (double) 1 / 3));
-                a = temp_a;
-                b = temp_b;
-                c = temp_c;
+                tempA = (Math.pow(b, (double) 1 / 3) * Math.pow(c, (double) 1 / 3) * Math.pow(a, (double) 2 / 3));
+                tempB = (Math.pow(b, (double) 2 / 3) * Math.pow(c, (double) -1 / 3) * Math.pow(a, (double) 1 / 3));
+                tempC = (Math.pow(b, (double) -1 / 3) * Math.pow(c, (double) 2 / 3) * Math.pow(a, (double) 1 / 3));
+                a = tempA;
+                b = tempB;
+                c = tempC;
 					
 					/* old incon reduce algorithm
 					if((b*c)<a)
@@ -620,29 +635,34 @@ class inconsistency extends JFrame implements ActionListener {
                 if (a < 0 || b < 0 || c < 0) {
                     warnWindow("No solution!", 400, 100);
                 } else {
-                    table.setValueAt(SystemConfiguration.formatNumber(a), highlighted_i, highlighted_j);
-                    table.setValueAt(SystemConfiguration.formatNumber(b), highlighted_i, highlighted_k);
-                    table.setValueAt(SystemConfiguration.formatNumber(c), highlighted_k, highlighted_j);
+                    table.setValueAt(formatNumber(a), highlightedI, highlightedJ);
+                    table.setValueAt(formatNumber(b), highlightedI, highlightedK);
+                    table.setValueAt(formatNumber(c), highlightedK, highlightedJ);
 
                     //table.setValueAt("1/"+String.valueOf(df.format(a)),highlighted_j,highlighted_i);
                     //table.setValueAt("1/"+String.valueOf(df.format(b)),highlighted_k,highlighted_i);
                     //table.setValueAt("1/"+String.valueOf(df.format(c)),highlighted_j,highlighted_k);
 
-                    table.setValueAt("" + SystemConfiguration.formatNumber(1 / Double.parseDouble(String.valueOf(a))), highlighted_j, highlighted_i);
-                    table.setValueAt("" + SystemConfiguration.formatNumber(1 / Double.parseDouble(String.valueOf(b))), highlighted_k, highlighted_i);
-                    table.setValueAt("" + SystemConfiguration.formatNumber(1 / Double.parseDouble(String.valueOf(c))), highlighted_j, highlighted_k);
+                    table.setValueAt("" + formatNumber(1 / Double.parseDouble(String.valueOf(a))),
+                                     highlightedJ,
+                                     highlightedI);
+                    table.setValueAt("" + formatNumber(1 / Double.parseDouble(String.valueOf(b))),
+                                     highlightedK,
+                                     highlightedI);
+                    table.setValueAt("" + formatNumber(1 / Double.parseDouble(String.valueOf(c))),
+                                     highlightedJ, highlightedK);
 
                 }
 
             }
-            ComIncon(cellValue);
-            showmaxincon(cellValue);
+            computeInconsistency(cellValue);
+            showMaxInconsistency(cellValue);
             table.setDefaultRenderer(Object.class, new EvenOddRenderer());
-        } else if (e.getSource() == button_locateElement)//locate the most inconsistent element in a triad
+        } else if (e.getSource() == buttonLocateElement)//locate the most inconsistent element in a triad
         {
-            double incon_aij[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//store all inconsistency values of triads involving element aij
-            double incon_aik[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//store all inconsistency values of triads involving element aik
-            double incon_akj[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//store all inconsistency values of triads involving element akj
+            double[] incon_aij = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//store all inconsistency values of triads involving element aij
+            double[] incon_aik = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//store all inconsistency values of triads involving element aik
+            double[] incon_akj = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//store all inconsistency values of triads involving element akj
             int count_aij = 0;//total number of triads involving aij
             int count_aik = 0;//total number of triads involving aik
             int count_akj = 0;//total number of triads involving akj
@@ -651,23 +671,17 @@ class inconsistency extends JFrame implements ActionListener {
             for (int i = 0; i < 5; i++) {
                 for (int k = i + 1; k < 6; k++) {
                     for (int j = k + 1; j < 7; j++) {
-                        if ((cellValue[i][j] != "") && (cellValue[i][k] != "") && (cellValue[k][j] != "")) {
-                            double a = SystemConfiguration.unformatNumberString(cellValue[i][j]);//obtain value from the matrix
-                            double b = SystemConfiguration.unformatNumberString(cellValue[i][k]);//obtain value from the matrix
-                            double c = SystemConfiguration.unformatNumberString(cellValue[k][j]);//obtain value from the matrix
-                            if ((i == highlighted_i && j == highlighted_j) || (i == highlighted_i && k == highlighted_j) || (k == highlighted_i && j == highlighted_j)) {
+                        if ((!cellValue[i][j].equals("")) && (!cellValue[i][k].equals("")) && (!cellValue[k][j].equals(""))) {
+                            double a = unformatNumberString(cellValue[i][j]);//obtain value from the matrix
+                            double b = unformatNumberString(cellValue[i][k]);//obtain value from the matrix
+                            double c = unformatNumberString(cellValue[k][j]);//obtain value from the matrix
+                            count_aij = getCount_aij(incon_aij, count_aij, i, k, j, a, b, c, highlightedJ, j == highlightedJ);
+                            count_aik = getCount_aij(incon_aik, count_aik, i, k, k, a, b, c, highlightedK, j == highlightedK);
+                            if ((i == highlightedK && i == highlightedI) || (i == highlightedK && k == highlightedJ) ||
+                                (k == highlightedK && j == highlightedJ)) {
                                 //System.out.print(i+","+j+" "+i+","+k+" "+k+","+j+"\n");
-                                incon_aij[count_aij] = (int) Math.round(Min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f;
-                                count_aij++;
-                            }
-                            if ((i == highlighted_i && k == highlighted_j) || (i == highlighted_i && k == highlighted_k) || (k == highlighted_i && j == highlighted_k)) {
-                                //System.out.print(i+","+j+" "+i+","+k+" "+k+","+j+"\n");
-                                incon_aik[count_aik] = (int) Math.round(Min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f;
-                                count_aik++;
-                            }
-                            if ((i == highlighted_k && i == highlighted_i) || (i == highlighted_k && k == highlighted_j) || (k == highlighted_k && j == highlighted_j)) {
-                                //System.out.print(i+","+j+" "+i+","+k+" "+k+","+j+"\n");
-                                incon_akj[count_akj] = (int) Math.round(Min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f;
+                                incon_akj[count_akj] = (int) Math.round(
+                                        min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f;
                                 count_akj++;
                             }
                         }
@@ -693,16 +707,27 @@ class inconsistency extends JFrame implements ActionListener {
 				}*/
             //find the elements among aij, aik and akj who involves in another triad having the highest inconsistency
             if (incon_aij[1] >= incon_aik[1] && incon_aij[1] >= incon_akj[1]) {
-                highlighted_k = 100;//disable ak(allows jc to highlight aij)
+                highlightedK = 100;//disable ak(allows jc to highlight aij)
             } else if (incon_aik[1] >= incon_aij[1] && incon_aik[1] >= incon_akj[1]) {
-                highlighted_j = 100;//disable aj(allows jc to highlight aik)
+                highlightedJ = 100;//disable aj(allows jc to highlight aik)
             } else if (incon_akj[1] >= incon_aik[1] && incon_akj[1] >= incon_aij[1]) {
-                highlighted_i = 100;//disable ai(allows jc to highlight akj)
+                highlightedI = 100;//disable ai(allows jc to highlight akj)
             }
         }
-        for (int i = 0; i < ChildNumber; i++) {
+        for (int i = 0; i < childNumber; i++) {
             table.setValueAt("1", i, i);//display 1 in the diagnal of the table
         }
+    }
+
+    private int getCount_aij(double[] incon_aij, int count_aij, int i, int k, int j, double a, double b, double c, int highlightedJ, boolean b2) {
+        if ((i == highlightedI && j == highlightedJ) || (i == highlightedI && k == highlightedJ) || (k ==
+                                                                                                     highlightedI && b2)) {
+            //System.out.print(i+","+j+" "+i+","+k+" "+k+","+j+"\n");
+            incon_aij[count_aij] = (int) Math.round(
+                    min(Math.abs(1 - a / (b * c)), Math.abs(1 - (b * c) / a)) * 100) / 100f;
+            count_aij++;
+        }
+        return count_aij;
     }
 
     private void close() {
@@ -726,11 +751,7 @@ class inconsistency extends JFrame implements ActionListener {
         warn.add(p1, BorderLayout.NORTH);
         warn.add(p2, BorderLayout.SOUTH);
         warn.setVisible(true);
-        ok.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                warn.dispose();
-            }
-        });
+        ok.addActionListener(e -> warn.dispose());
     }
 
     //table anction listener
@@ -738,11 +759,11 @@ class inconsistency extends JFrame implements ActionListener {
         public void tableChanged(TableModelEvent e) {
             int row = e.getFirstRow();
             int column = e.getColumn();
-            String tablevalue = (String) table.getValueAt(row, column);
+            String tableValueAt = (String) table.getValueAt(row, column);
             if (row != column) {
-                if (tablevalue != ",," && tablevalue != "" && tablevalue != null) {
-                    String strs[] = new String[3];
-                    strs = tablevalue.split(",");
+                if (!tableValueAt.equals(",,") && !tableValueAt.equals("")) {
+                    String[] strs = new String[3];
+                    strs = tableValueAt.split(",");
                     cellValue[row][column] = strs[0];//store the input data from the table
                 }
             } else {
