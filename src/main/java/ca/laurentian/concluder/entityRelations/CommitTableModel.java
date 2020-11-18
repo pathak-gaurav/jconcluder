@@ -20,11 +20,6 @@ public class CommitTableModel extends DefaultTableModel {
     }
 
     @Override
-    public int getColumnCount() {
-        return super.getColumnCount();
-    }
-
-    @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false;
     }
@@ -42,16 +37,6 @@ public class CommitTableModel extends DefaultTableModel {
                 return String.class;
             }
         }
-    }
-
-    @Override
-    public String getColumnName(int columnIndex) {
-        return super.getColumnName(columnIndex);
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        return super.getValueAt(rowIndex, columnIndex);
     }
 
     @Override

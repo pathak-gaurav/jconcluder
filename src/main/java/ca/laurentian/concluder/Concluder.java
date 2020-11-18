@@ -9,7 +9,7 @@ import ca.laurentian.concluder.refactorState.RootableTree;
 import ca.laurentian.concluder.refactorState.SystemConfiguration;
 import ca.laurentian.concluder.refactorState.SystemSettings;
 import ca.laurentian.concluder.refactorState.TreeStructureValidation;
-import ca.laurentian.concluder.refactorState.View_Mode_Administrator;
+import ca.laurentian.concluder.refactorState.ViewModeAdministrator;
 import ca.laurentian.concluder.refactorState.Weight_Redistributor;
 import com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme;
 import prefuse.data.Edge;
@@ -44,7 +44,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -313,16 +312,8 @@ public class Concluder {
         mnuItemEdit.addActionListener(new ListenEdit());
         mnuItemLink.addActionListener(new ListenLink());
         mnuItemUnlink.addActionListener(new ListenUnlink());
-        mnuItemZoomIn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                warnWindow("Drag down with right pressed to zoom in.", 400, 100);
-            }
-        });
-        mnuItemZoomOut.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                warnWindow("Drag up with right pressed to zoom out.", 400, 100);
-            }
-        });
+        mnuItemZoomIn.addActionListener(e -> warnWindow("Drag down with right pressed to zoom in.", 400, 100));
+        mnuItemZoomOut.addActionListener(e -> warnWindow("Drag up with right pressed to zoom out.", 400, 100));
         mnuItemAnalyze.addActionListener(new ListenAnalyze());
         mnuItemOutputPC.addActionListener(new ListenOutputPC());
         mnuItemWeights.addActionListener(new ListenWeights());
@@ -347,7 +338,7 @@ public class Concluder {
     }
 
     private void viewModeRequested(int viewMode) {
-        new View_Mode_Administrator(viewMode, graph);
+        new ViewModeAdministrator(viewMode, graph);
     }
 
     //display a warn window
@@ -480,7 +471,7 @@ public class Concluder {
                 frame.remove(hv.d);
             hv = new HierarchyVisualization();
             hv.Create(fileType, frame, graph,/*frame.getSize().width/2, frame.getSize().height/4,*/ selectedNode, selectedNodeVisualItem);
-            new View_Mode_Administrator(viewMode, tree);
+            new ViewModeAdministrator(viewMode, tree);
             frame.setTitle("JConcluder - " + file.getName());
             enableMenuItems(true);
         }
@@ -496,7 +487,7 @@ public class Concluder {
                 graph = tree;
                 tree.getRoot().set("weight2", 100.0);
                 new Weight_Redistributor(viewMode).Redistribute_From_Root(tree.getRoot());
-                new View_Mode_Administrator(viewMode, graph);
+                new ViewModeAdministrator(viewMode, graph);
                 if (hv.d != null)
                     frame.remove(hv.d);
                 hv = new HierarchyVisualization();
@@ -510,7 +501,7 @@ public class Concluder {
                     frame.remove(hv.d);
                 hv = new HierarchyVisualization();
                 hv.Create(fileType, frame, graph,/*frame.getSize().width/2, frame.getSize().height/4,*/ selectedNode, selectedNodeVisualItem);
-                new View_Mode_Administrator(viewMode, graph);
+                new ViewModeAdministrator(viewMode, graph);
                 frame.setTitle("JConcluder - " + file.getName());
                 enableMenuItems(true);
             }
@@ -540,15 +531,7 @@ public class Concluder {
                     return;
                 }
                 final NewNodeDialog nnd = new NewNodeDialog(frame, graph, true, graph.getNode(hv.SelectedNodeID).getString("name"), true);
-                nnd.addWindowListener(new WindowListener() {
-                    @Override
-                    public void windowOpened(WindowEvent e) {
-                    }
-
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                    }
-
+                nnd.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosed(WindowEvent e) {
                         //all criteria is valid, node can be created
@@ -559,22 +542,6 @@ public class Concluder {
                             hv.runLayout();
                             frame.add(hv.d);
                         }
-                    }
-
-                    @Override
-                    public void windowIconified(WindowEvent e) {
-                    }
-
-                    @Override
-                    public void windowDeiconified(WindowEvent e) {
-                    }
-
-                    @Override
-                    public void windowActivated(WindowEvent e) {
-                    }
-
-                    @Override
-                    public void windowDeactivated(WindowEvent e) {
                     }
                 });
                 nnd.setVisible(true);
@@ -611,16 +578,7 @@ public class Concluder {
             final NewNodeDialog nnd = new NewNodeDialog(frame, graph, true, graph.getNode(hv.SelectedNodeID).getString("name"), false);
             nnd.setName(graph.getNode(hv.SelectedNodeID).getString("name"));
             nnd.setDesc(graph.getNode(hv.SelectedNodeID).getString("desc"));
-            nnd.addWindowListener(new WindowListener() {
-
-                @Override
-                public void windowOpened(WindowEvent e) {
-                }
-
-                @Override
-                public void windowClosing(WindowEvent e) {
-                }
-
+            nnd.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     //node criteria is valid, submit new data
@@ -629,22 +587,6 @@ public class Concluder {
                         graph.getNode(hv.getSelectedNodeID()).set("noddis", nnd.getName() + "\n" + SystemConfiguration.formatNumber(graph.getNode(hv.SelectedNodeID).getDouble("weight")));
                         graph.getNode(hv.getSelectedNodeID()).set("desc", nnd.getDesc());
                     }
-                }
-
-                @Override
-                public void windowIconified(WindowEvent e) {
-                }
-
-                @Override
-                public void windowDeiconified(WindowEvent e) {
-                }
-
-                @Override
-                public void windowActivated(WindowEvent e) {
-                }
-
-                @Override
-                public void windowDeactivated(WindowEvent e) {
                 }
             });
             nnd.setVisible(true);
@@ -698,17 +640,6 @@ public class Concluder {
         public void actionPerformed(ActionEvent event) {
             if (selectedNode.size() == 2)//unconnect 2 nodes
             {
-                ///this is unnecessary given node IDs and edge IDs
-				/*
-				for(int i=0;i<graph.getEdgeCount();i++)
-				{
-					if((graph.getEdge(i).getSourceNode()==graph.getNode(Integer.valueOf(selectednode.get(0)))&&(graph.getEdge(i).getTargetNode()==graph.getNode(Integer.valueOf(selectednode.get(1)))))||(graph.getEdge(i).getSourceNode()==graph.getNode(Integer.valueOf(selectednode.get(1)))&&(graph.getEdge(i).getTargetNode()==graph.getNode(Integer.valueOf(selectednode.get(0))))))
-					{
-						graph.removeEdge(i);
-					}
-				}
-				*/
-
                 Node n1 = graph.getNode(Integer.parseInt(selectedNode.get(0)));
                 Node n2 = graph.getNode(Integer.parseInt(selectedNode.get(1)));
                 if (Integer.parseInt(selectedNode.get(0)) > Integer.parseInt(selectedNode.get(1))) {
