@@ -1,6 +1,6 @@
 package ca.laurentian.concluder.entityRelations;
 
-import ca.laurentian.concluder.refactorState.View_Mode_Administrator;
+import ca.laurentian.concluder.refactorState.ViewModeAdministrator;
 import ca.laurentian.concluder.refactorState.Weight_Redistributor;
 import ca.laurentian.concluder.refactorState.Weight_Reevaluator;
 import prefuse.data.Graph;
@@ -274,7 +274,7 @@ public class RelateFormDomain {
             Weight_Redistributor rw = new Weight_Redistributor(-1);
             rw.Redistribute_From_Root(parentNode.getChild(i));
         }
-        new View_Mode_Administrator(viewMode, g);
+        new ViewModeAdministrator(viewMode, g);
     }
 
     private void resetUITable() {

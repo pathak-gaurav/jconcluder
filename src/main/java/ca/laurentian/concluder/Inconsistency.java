@@ -2,7 +2,7 @@ package ca.laurentian.concluder;
 
 import ca.laurentian.concluder.refactorState.PCTableModel;
 import ca.laurentian.concluder.refactorState.RXTable;
-import ca.laurentian.concluder.refactorState.View_Mode_Administrator;
+import ca.laurentian.concluder.refactorState.ViewModeAdministrator;
 import ca.laurentian.concluder.refactorState.Weight_Redistributor;
 import ca.laurentian.concluder.refactorState.Weight_Reevaluator;
 import prefuse.data.Graph;
@@ -328,7 +328,7 @@ class Inconsistency extends JFrame implements ActionListener {
                     Weight_Redistributor rw = new Weight_Redistributor(viewMode);
                     rw.Redistribute_From_Root(graph.getNode(ananode).getChild(i));
                 }
-                new View_Mode_Administrator(viewMode, graph);
+                new ViewModeAdministrator(viewMode, graph);
             }
             frame.setVisible(false);
             frame.dispose();

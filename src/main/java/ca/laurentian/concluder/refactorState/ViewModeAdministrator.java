@@ -5,12 +5,12 @@ import prefuse.data.Node;
 
 import java.util.Iterator;
 
-public class View_Mode_Administrator {
-    final private static byte VIEW_GLOBAL_MODE = 0;
-    final private static String VIEW_GLOBAL_MODE_WEIGHT_SPECIFIER = "weight";
+public class ViewModeAdministrator {
+     private static final byte VIEW_GLOBAL_MODE = 0;
+     private static final String VIEW_GLOBAL_MODE_WEIGHT_SPECIFIER = "weight";
 
-    final private static byte VIEW_LOCAL_MODE = 1;
-    final private static String VIEW_LOCAL_MODE_WEIGHT_SPECIFIER = "weight2";
+     private static final byte VIEW_LOCAL_MODE = 1;
+     private static final String VIEW_LOCAL_MODE_WEIGHT_SPECIFIER = "weight2";
 
     private static final String NODE_DISPLAY = "noddis";
     private static final String NODE_NAME = "name";
@@ -21,7 +21,7 @@ public class View_Mode_Administrator {
      * @param viewMode - The view mode which displays the given weight specified
      * @param g        - The graph to have the view mode applied
      */
-    public View_Mode_Administrator(int viewMode, Graph g) {
+    public ViewModeAdministrator(int viewMode, Graph g) {
         runViewMode(viewMode, g);
     }
 
@@ -34,10 +34,9 @@ public class View_Mode_Administrator {
      */
     private void runViewMode(int viewMode, Graph g) {
         if (viewMode == VIEW_LOCAL_MODE)
-            viewModeGraphWalk(View_Mode_Administrator.VIEW_LOCAL_MODE_WEIGHT_SPECIFIER, g);
+            viewModeGraphWalk(ViewModeAdministrator.VIEW_LOCAL_MODE_WEIGHT_SPECIFIER, g);
         else if (viewMode == VIEW_GLOBAL_MODE)
-            viewModeGraphWalk(View_Mode_Administrator.VIEW_GLOBAL_MODE_WEIGHT_SPECIFIER, g);
-        else {/*some other implementation of the view*/}
+            viewModeGraphWalk(ViewModeAdministrator.VIEW_GLOBAL_MODE_WEIGHT_SPECIFIER, g);
     }
 
     /**
@@ -51,7 +50,7 @@ public class View_Mode_Administrator {
         @SuppressWarnings("unchecked")
         Iterator<Node> i = g.nodes();
         while (i.hasNext()) {
-            Node n = (Node) i.next();
+            Node n = i.next();
             //set the display given
             n.set(NODE_DISPLAY, n.get(NODE_NAME) + "\n" + SystemConfiguration.formatNumber(n.getDouble(viewModeWeightSpecifier)));
         }

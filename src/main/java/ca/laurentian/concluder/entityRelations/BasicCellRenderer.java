@@ -11,10 +11,10 @@ public class BasicCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-        //Cells are by default rendered as a JLabel.
+        /* Cells are by default rendered as a JLabel. */
         JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 
-        //Get the status for the current row.
+        /* Get the status for the current row. */
         if (row % 2 == 1)
             l.setBackground(Color.DARK_GRAY);
         else

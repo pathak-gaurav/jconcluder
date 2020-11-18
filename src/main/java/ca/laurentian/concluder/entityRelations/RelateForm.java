@@ -102,43 +102,43 @@ public class RelateForm extends JDialog {
 
         JPanel panel = new JPanel();
         panel.setBorder(new TitledBorder(null, LINGUISTIC_EXPRESSION, TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        GridBagConstraints gbc_panel = new GridBagConstraints();
-        gbc_panel.insets = new Insets(0, 0, 5, 5);
-        gbc_panel.fill = GridBagConstraints.BOTH;
-        gbc_panel.gridx = 0;
-        gbc_panel.gridy = 0;
-        gbc_panel.gridwidth = 3;
-        getContentPane().add(panel, gbc_panel);
-        GridBagLayout gbl_panel = new GridBagLayout();
-        gbl_panel.columnWidths = new int[]{0, 0, 0};
-        gbl_panel.rowHeights = new int[]{0, 0, 0};
-        gbl_panel.columnWeights = new double[]{0.5, 0.5, Double.MIN_VALUE};
-        gbl_panel.rowWeights = new double[]{0.25, 0.75, Double.MIN_VALUE};
-        panel.setLayout(gbl_panel);
+        GridBagConstraints gbcPanel = new GridBagConstraints();
+        gbcPanel.insets = new Insets(0, 0, 5, 5);
+        gbcPanel.fill = GridBagConstraints.BOTH;
+        gbcPanel.gridx = 0;
+        gbcPanel.gridy = 0;
+        gbcPanel.gridwidth = 3;
+        getContentPane().add(panel, gbcPanel);
+        GridBagLayout gblPanel = new GridBagLayout();
+        gblPanel.columnWidths = new int[]{0, 0, 0};
+        gblPanel.rowHeights = new int[]{0, 0, 0};
+        gblPanel.columnWeights = new double[]{0.5, 0.5, Double.MIN_VALUE};
+        gblPanel.rowWeights = new double[]{0.25, 0.75, Double.MIN_VALUE};
+        panel.setLayout(gblPanel);
 
         JLabel label = new JLabel("Specify a linguistic expression by one of two ways (a drop down list or a user text) to be used in the entire process.");
-        GridBagConstraints gbc_label = new GridBagConstraints();
-        gbc_label.anchor = GridBagConstraints.WEST;
-        gbc_label.gridwidth = 2;
-        gbc_label.insets = new Insets(10, 0, 10, 0);
-        gbc_label.gridx = 0;
-        gbc_label.gridy = 0;
-        panel.add(label, gbc_label);
+        GridBagConstraints gbcLabel = new GridBagConstraints();
+        gbcLabel.anchor = GridBagConstraints.WEST;
+        gbcLabel.gridwidth = 2;
+        gbcLabel.insets = new Insets(10, 0, 10, 0);
+        gbcLabel.gridx = 0;
+        gbcLabel.gridy = 0;
+        panel.add(label, gbcLabel);
 
-        JPanel panel_1 = new JPanel();
-        panel_1.setBorder(new TitledBorder(null, "Program Defined Expressions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        GridBagConstraints gbc_panel_1 = new GridBagConstraints();
-        gbc_panel_1.fill = GridBagConstraints.BOTH;
-        gbc_panel_1.insets = new Insets(0, 0, 0, 5);
-        gbc_panel_1.gridx = 0;
-        gbc_panel_1.gridy = 1;
-        panel.add(panel_1, gbc_panel_1);
+        JPanel jPanel1 = new JPanel();
+        jPanel1.setBorder(new TitledBorder(null, "Program Defined Expressions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        GridBagConstraints gbcPanel1 = new GridBagConstraints();
+        gbcPanel1.fill = GridBagConstraints.BOTH;
+        gbcPanel1.insets = new Insets(0, 0, 0, 5);
+        gbcPanel1.gridx = 0;
+        gbcPanel1.gridy = 1;
+        panel.add(jPanel1, gbcPanel1);
         GridBagLayout gbl_panel_1 = new GridBagLayout();
         gbl_panel_1.columnWidths = new int[]{0, 0, 0};
         gbl_panel_1.rowHeights = new int[]{0, 0, 0};
         gbl_panel_1.columnWeights = new double[]{0.03, 0.97, Double.MIN_VALUE};
         gbl_panel_1.rowWeights = new double[]{0.5, 0.5, Double.MIN_VALUE};
-        panel_1.setLayout(gbl_panel_1);
+        jPanel1.setLayout(gbl_panel_1);
 
         JLabel label_1 = new JLabel("Default Expressions:");
         GridBagConstraints gbc_label_1 = new GridBagConstraints();
@@ -146,7 +146,7 @@ public class RelateForm extends JDialog {
         gbc_label_1.insets = new Insets(0, 0, 5, 5);
         gbc_label_1.gridx = 0;
         gbc_label_1.gridy = 0;
-        panel_1.add(label_1, gbc_label_1);
+        jPanel1.add(label_1, gbc_label_1);
 
         comboBoxLinguisticTerm = new JComboBox<>();
         comboBoxLinguisticTerm.addItemListener(e -> {
@@ -159,7 +159,7 @@ public class RelateForm extends JDialog {
         gbc_comboBox_linguisticTerm.insets = new Insets(0, 0, 5, 0);
         gbc_comboBox_linguisticTerm.gridx = 1;
         gbc_comboBox_linguisticTerm.gridy = 0;
-        panel_1.add(comboBoxLinguisticTerm, gbc_comboBox_linguisticTerm);
+        jPanel1.add(comboBoxLinguisticTerm, gbc_comboBox_linguisticTerm);
 
         JPanel panel_2 = new JPanel();
         panel_2.setBorder(new TitledBorder(null, "User Defined Expressions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -640,12 +640,6 @@ public class RelateForm extends JDialog {
         panel_2.add(btnNewButton, gbc_btnNewButton);
 
         JButton button = new JButton(">>");
-        button.addActionListener(e -> {
-            /*
-            if(slider.getValue()+1<=slider.getMaximum())
-                rfd.setSliderPosition(slider.getValue()+1);
-            */
-        });
         GridBagConstraints gbc_button = new GridBagConstraints();
         gbc_button.anchor = GridBagConstraints.WEST;
         gbc_button.gridx = 3;

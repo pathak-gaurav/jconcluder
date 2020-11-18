@@ -17,6 +17,7 @@ public abstract class ConcluderConstant {
     public static final String LESS_THAN = "Less Than(<)";
     public static final String UNLINK = "Unlink";
     public static final String RELATE = "Relate";
+    public static final String NODE_ID = "Node_ID";
 
 
 

@@ -11,6 +11,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.time.LocalDateTime;
 
+import static ca.laurentian.concluder.constants.ConcluderConstant.LINGUISTIC_TERM;
+import static ca.laurentian.concluder.constants.ConcluderConstant.NODE_ID;
+
 public class FileIO {
 
     private File currentStateFile;
@@ -114,33 +117,33 @@ public class FileIO {
                 if (newFile)
                     PrefuseAPIAccess.exportTree(jfc.getSelectedFile(), GraphLib.getInitializedTree());
                 currentStateTree = PrefuseAPIAccess.importTree(jfc.getSelectedFile());
-                if (currentStateTree.getNodeTable().getColumn("Linguistic_Term") == null)
-                    currentStateTree.getNodeTable().addColumn("Linguistic_Term", String.class, "Greater Than(>)");
+                if (currentStateTree.getNodeTable().getColumn(LINGUISTIC_TERM) == null)
+                    currentStateTree.getNodeTable().addColumn(LINGUISTIC_TERM, String.class, "Greater Than(>)");
                 //graph
                 if (currentStateTree.getRootRow() == -1) {
                     JOptionPane.showMessageDialog(null, "JConcluder file format has been updated.\nFile conversion will take place to match version conformance.\n"
                             + "\nJConcluder assume previous graph was constructed properly.\n"
                             + "Assumptions are:\n"
                             + "1.  A source node not as target is taken for new tree root.\n"
-                            + "2.  Source and target nodes are mapped to Parent Child respectivly.\n"
+                            + "2.  Source and target nodes are mapped to Parent Child respectively.\n"
                             + "\n\nNext file load will be current to Concluder file format.", "File Conversion", JOptionPane.INFORMATION_MESSAGE);
 
                     GraphMLReader gr = new GraphMLReader();
                     Graph g = gr.readGraph(jfc.getSelectedFile());
-                    g.getNodeTable().addColumn("Node_ID", int.class);
+                    g.getNodeTable().addColumn(NODE_ID, int.class);
                     for (int i = 0; i < g.getNodeCount(); i++)
-                        g.getNode(i).setInt("Node_ID", g.getNode(i).getRow());
+                        g.getNode(i).setInt(NODE_ID, g.getNode(i).getRow());
                     if (g.getNodeTable().getColumn("weight2") == null)
                         g.getNodeTable().addColumn("weight2", double.class, -1);
-                    if (g.getNodeTable().getColumn("Linguistic_Term") == null)
-                        g.getNodeTable().addColumn("Linguistic_Term", String.class, "Greater Than(>)");
+                    if (g.getNodeTable().getColumn(LINGUISTIC_TERM) == null)
+                        g.getNodeTable().addColumn(LINGUISTIC_TERM, String.class, "Greater Than(>)");
 
                     //look for root
                     int r = -1;
                     for (int i = 0; i < g.getNodeTable().getRowCount(); i++) {
-                        int tester = g.getNodeTable().getTuple(i).getInt("Node_ID");
+                        int tester = g.getNodeTable().getTuple(i).getInt(NODE_ID);
                         for (int j = 0; j < g.getEdgeTable().getRowCount(); j++) {
-                            if (!(g.getEdgeTable().getTuple(j).getInt("target") == tester))
+                            if (g.getEdgeTable().getTuple(j).getInt("target") != tester)
                                 r = tester;
                             else
                                 r = -1;
@@ -154,7 +157,7 @@ public class FileIO {
                         currentStateGraph = g;
                         return SystemConfiguration.GRAPH_FILE;
                     } else {
-                        RootableTree rt = new RootableTree(g.getNodeTable(), g.getEdgeTable(), "Node_ID", "source", "target");
+                        RootableTree rt = new RootableTree(g.getNodeTable(), g.getEdgeTable(), NODE_ID, "source", "target");
                         rt.setNewRoot(g.getNode(r));
                         currentStateTree = rt;
                         JOptionPane.showMessageDialog(null, "Root Node Identified:\n\n" + g.getNode(r).getString("name"), "Root Node Found", JOptionPane.INFORMATION_MESSAGE);
@@ -179,13 +182,11 @@ public class FileIO {
                 File f = getSelectedFile();
                 if (f.exists()) {
                     int result = JOptionPane.showConfirmDialog(this, "The file already exists, overwrite this file?", "Existing file", JOptionPane.YES_NO_CANCEL_OPTION);
-                    switch (result) {
-                        case JOptionPane.YES_OPTION:
-                            super.approveSelection();
-                            return;
-                        default:
-                            return;
+                    if (result == JOptionPane.YES_OPTION) {
+                        super.approveSelection();
+                        return;
                     }
+                    return;
                 }
                 super.approveSelection();
             }
@@ -226,239 +227,4 @@ public class FileIO {
         currentStateFile = null;
         currentStateGraph = null;
     }
-
-    //this never seems to be actually used
-    //the graph writer likely would avoid any use of this
-	
-	/*
-	public static String saveFileToXML(String xml) 
-	{
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    
-		try 
-		{
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document dom = db.newDocument();
-
-			Element root = dom.createElement("graphml");
-			Element root2 = dom.createElement("graph");
-        
-			Attr attr = dom.createAttribute("xmlns");
-			attr.setValue("http://graphml.graphdrawing.org/xmlns");
-			root.setAttributeNode(attr);
-		
-			attr = dom.createAttribute("edgedefault");
-			attr.setValue("undirected");
-			root2.setAttributeNode(attr);
-        
-			root.appendChild(root2);
-		
-			Element e;
-			
-			//----------------------------------------------------------------
-			
-			e = dom.createElement("key");
-			attr = dom.createAttribute("id");
-			attr.setValue("name");
-			e.setAttributeNode(attr);
-			
-			attr = dom.createAttribute("for");
-			attr.setValue("node");
-			e.setAttributeNode(attr);
-			
-			attr = dom.createAttribute("attr.name");
-			attr.setValue("name");
-			e.setAttributeNode(attr);
-		
-			attr = dom.createAttribute("attr.type");
-			attr.setValue("string");
-			e.setAttributeNode(attr);
-		
-			root2.appendChild(e);
-			
-			//---------------------------------------------------------
-			//----------------------------------------------------------
-			
-			e = dom.createElement("key");
-			attr = dom.createAttribute("id");
-			attr.setValue("weight");
-			e.setAttributeNode(attr);
-			
-			//common code
-			attr = dom.createAttribute("for");
-			attr.setValue("node");
-			e.setAttributeNode(attr);
-			//
-			
-			attr = dom.createAttribute("attr.name");
-			attr.setValue("weight");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.type");
-			attr.setValue("double");
-			e.setAttributeNode(attr);
-        
-			root2.appendChild(e);
-			
-			//----------------------------------------------------------
-			
-			//----------------------------------------------------------
-			e = dom.createElement("key");
-			attr = dom.createAttribute("id");
-			attr.setValue("description");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("for");
-			attr.setValue("node");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.name");
-			attr.setValue("desc");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.type");
-			attr.setValue("string");
-			e.setAttributeNode(attr);
-        
-			root2.appendChild(e);
-			
-			//-------------------------------------------------------------------
-			//-------------------------------------------------------------------
-			
-			e = dom.createElement("key");
-			attr = dom.createAttribute("id");
-			attr.setValue("relation");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("for");
-			attr.setValue("node");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.name");
-			attr.setValue("rel");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.type");
-			attr.setValue("string");
-			e.setAttributeNode(attr);
-        
-			root2.appendChild(e);
-			
-			//-----------------------------------------------------------------------
-			//-----------------------------------------------------------------------
-			
-			e = dom.createElement("key");
-			attr = dom.createAttribute("id");
-			attr.setValue("nodedisplay");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("for");
-			attr.setValue("node");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.name");
-			attr.setValue("noddis");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.type");
-			attr.setValue("string");
-			e.setAttributeNode(attr);
-        
-			root2.appendChild(e);
-			
-			//-----------------------------------------------------------------------------------
-			//-----------------------------------------------------------------------------------
-			
-			//new weight2
-			e = dom.createElement("key");
-			attr = dom.createAttribute("id");
-			attr.setValue("weight2");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("for");
-			attr.setValue("node");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.name");
-			attr.setValue("weight2");
-			e.setAttributeNode(attr);
-        
-			attr = dom.createAttribute("attr.type");
-			attr.setValue("double");
-			e.setAttributeNode(attr);
-        
-			root2.appendChild(e);
-			
-			//-------------------------------------------------------------------------------
-			//-------------------------------------------------------------------------------
-			
-			//------------------------------------------------------------------------------
-			//------------------------------------------------------------------------------
-			//CREATE ROOT BY HAND
-			
-			e = dom.createElement("node");
-			attr = dom.createAttribute("id");
-			attr.setValue("0");
-			e.setAttributeNode(attr);
-        
-			root2.appendChild(e);
-			
-			Element node = dom.createElement("data");
-			Attr nodeAttr = dom.createAttribute("key");
-			nodeAttr.setValue("name");
-			node.setAttributeNode(nodeAttr);
-			node.appendChild(dom.createTextNode("ROOT"));
-			e.appendChild(node);
-		
-			node = dom.createElement("data");
-			nodeAttr = dom.createAttribute("key");
-			nodeAttr.setValue("weight");
-			node.setAttributeNode(nodeAttr);
-			node.appendChild(dom.createTextNode("100"));
-			e.appendChild(node);
-		
-			node = dom.createElement("data");
-			nodeAttr = dom.createAttribute("key");
-			nodeAttr.setValue("description");
-			node.setAttributeNode(nodeAttr);
-			node.appendChild(dom.createTextNode("root..."));
-			e.appendChild(node);
-		
-			node = dom.createElement("data");
-			nodeAttr = dom.createAttribute("key");
-			nodeAttr.setValue("nodedisplay");
-			node.setAttributeNode(nodeAttr);
-			node.appendChild(dom.createTextNode("root"+"\n"+ "100"));
-			e.appendChild(node);
-			
-			node = dom.createElement("data");
-			nodeAttr = dom.createAttribute("key");
-			nodeAttr.setValue("weight2");
-			node.setAttributeNode(nodeAttr);
-			node.appendChild(dom.createTextNode("99.99"));
-			e.appendChild(node);
-			
-			dom.appendChild(root);
-			
-			//---------------------------------------------------------------------------
-			//---------------------------------------------------------------------------
-			
-			try 
-			{
-				Transformer tr = TransformerFactory.newInstance().newTransformer();
-				tr.setOutputProperty(OutputKeys.INDENT, "yes");
-				tr.setOutputProperty(OutputKeys.METHOD, "xml");
-				tr.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-				tr.transform(new DOMSource(dom), new StreamResult(new FileOutputStream(xml)));
-			} 
-			catch(TransformerException te) 
-			{System.out.println(te.getMessage());return te.toString();} 
-			catch (IOException ioe) 
-			{System.out.println(ioe.getMessage());return ioe.toString();}
-			return "0";
-		} 
-		catch (ParserConfigurationException pce) 
-		{return pce.toString();}
-	}
-	*/
 }

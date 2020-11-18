@@ -10,6 +10,7 @@ import prefuse.action.assignment.FontAction;
 import prefuse.action.layout.graph.NodeLinkTreeLayout;
 import prefuse.activity.Activity;
 import prefuse.controls.Control;
+import prefuse.controls.ControlAdapter;
 import prefuse.controls.PanControl;
 import prefuse.controls.SubtreeDragControl;
 import prefuse.controls.ZoomControl;
@@ -24,11 +25,9 @@ import prefuse.visual.VisualItem;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -49,7 +48,7 @@ public class HierarchyVisualization extends Visualization {
     public VisualItem currentItem;
 
     //create and open a visualization in java window to display models
-    public void Create(String fileType, JFrame frame, Graph g,  /*double displayWidth, double displayHeight,*/ ArrayList<String> _selectednode, ArrayList<VisualItem> _selectedNodeVisualItem) {
+    public void Create(String fileType, JFrame frame, Graph g,  /*double displayWidth, double displayHeight,*/  ArrayList<String> _selectednode, ArrayList<VisualItem> _selectedNodeVisualItem) {
         //add the graph in xml file to m_vis
         final ArrayList<String> selectednode = _selectednode;
         final ArrayList<VisualItem> selectedNodeVisualItem = _selectedNodeVisualItem;
@@ -137,14 +136,10 @@ public class HierarchyVisualization extends Visualization {
         d.addControlListener(new ZoomControl());
         //*** WORK ON THIS NEXT
         d.addControlListener(new ZoomToFitControl());
-        d.addControlListener(new Control() {
+        d.addControlListener(new ControlAdapter() {
             public boolean isEnabled() {
                 return true;
             }
-
-            public void setEnabled(boolean enabled) {
-            }
-
             public void itemClicked(VisualItem item, MouseEvent e) {
                 // IMPORTANT: These four lines are all you need to
                 // change the selected items programmatically
@@ -153,13 +148,9 @@ public class HierarchyVisualization extends Visualization {
                 SelectedNodeID = item.getRow();
                 current = e.getLocationOnScreen();
                 currentItem = item;
-
                 if (e.getClickCount() == 2) {
-
-
                     //remove highlight on all other current selections
-                    for (int i = 0; i < selectedNodeVisualItem.size(); i++)
-                        selectedNodeVisualItem.get(i).setHighlighted(false);
+                    for (VisualItem visualItem : selectedNodeVisualItem) visualItem.setHighlighted(false);
                     //clear both selected node containers
                     selectednode.clear();
                     selectedNodeVisualItem.clear();
@@ -171,16 +162,7 @@ public class HierarchyVisualization extends Visualization {
                     final NewNodeDialog nnd = new NewNodeDialog(_frame, _g, true, _g.getNode(SelectedNodeID).getString("name"), false);
                     nnd.setName(_g.getNode(SelectedNodeID).getString("name"));
                     nnd.setDesc(_g.getNode(SelectedNodeID).getString("desc"));
-                    nnd.addWindowListener(new WindowListener() {
-
-                        @Override
-                        public void windowOpened(WindowEvent e) {
-                        }
-
-                        @Override
-                        public void windowClosing(WindowEvent e) {
-                        }
-
+                    nnd.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosed(WindowEvent e) {
                             //node criteria is valid, submit new data
@@ -190,22 +172,6 @@ public class HierarchyVisualization extends Visualization {
                                 _g.getNode(SelectedNodeID).set("desc", nnd.getDesc());
                             }
                         }
-
-                        @Override
-                        public void windowIconified(WindowEvent e) {
-                        }
-
-                        @Override
-                        public void windowDeiconified(WindowEvent e) {
-                        }
-
-                        @Override
-                        public void windowActivated(WindowEvent e) {
-                        }
-
-                        @Override
-                        public void windowDeactivated(WindowEvent e) {
-                        }
                     });
                     nnd.setVisible(true);
                 } else {
@@ -214,7 +180,7 @@ public class HierarchyVisualization extends Visualization {
                         int index = selectednode.indexOf(String.valueOf(SelectedNodeID));
                         selectednode.remove(index);
                         selectedNodeVisualItem.remove(index);
-                        if (selectednode.size() > 0)
+                        if (!selectednode.isEmpty())
                             SelectedNodeID = Integer.parseInt(selectednode.get(selectednode.size() - 1));
                         else
                             SelectedNodeID = -1;
@@ -225,7 +191,6 @@ public class HierarchyVisualization extends Visualization {
                         if (selectednode.size() == 2) {
                             selectednode.remove(0);
                             selectedNodeVisualItem.get(0).setHighlighted(false);
-                            ;
                             selectedNodeVisualItem.remove(0);
                         }
                         selectednode.add(String.valueOf(SelectedNodeID));
@@ -236,69 +201,6 @@ public class HierarchyVisualization extends Visualization {
                 }
                 focused.addTuple(item);
                 run("colors");
-            }
-
-            public void itemDragged(VisualItem item, MouseEvent e) {
-            }
-
-            public void itemMoved(VisualItem item, MouseEvent e) {
-            }
-
-            public void itemWheelMoved(VisualItem item, MouseWheelEvent e) {
-            }
-
-            public void itemPressed(VisualItem item, MouseEvent e) {
-            }
-
-            public void itemReleased(VisualItem item, MouseEvent e) {
-            }
-
-            public void itemEntered(VisualItem item, MouseEvent e) {
-            }
-
-            public void itemExited(VisualItem item, MouseEvent e) {
-            }
-
-            public void itemKeyPressed(VisualItem item, KeyEvent e) {
-            }
-
-            public void itemKeyReleased(VisualItem item, KeyEvent e) {
-            }
-
-            public void itemKeyTyped(VisualItem item, KeyEvent e) {
-            }
-
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            public void mouseExited(MouseEvent e) {
-            }
-
-            public void mousePressed(MouseEvent e) {
-            }
-
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            public void mouseDragged(MouseEvent e) {
-            }
-
-            public void mouseMoved(MouseEvent e) {
-            }
-
-            public void mouseWheelMoved(MouseWheelEvent e) {
-            }
-
-            public void keyPressed(KeyEvent e) {
-            }
-
-            public void keyReleased(KeyEvent e) {
-            }
-
-            public void keyTyped(KeyEvent e) {
             }
         });
         // Hold the visualization in the fram
