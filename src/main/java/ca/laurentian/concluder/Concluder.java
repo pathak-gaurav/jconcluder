@@ -1,5 +1,6 @@
 package ca.laurentian.concluder;
 
+import ca.laurentian.concluder.constants.ConcluderConstant;
 import ca.laurentian.concluder.entityRelations.RelateForm;
 import ca.laurentian.concluder.refactorState.FileIO;
 import ca.laurentian.concluder.refactorState.HierarchyVisualization;
@@ -64,7 +65,7 @@ public class Concluder {
     private static final String DESC = "description";//description of node
     private static final String DIS = "noddis";//the displayed name of node(name + weight)
     //current selected node ID
-    int SelectedNodeID;//store the id of the selected node
+    int selectedNodeID;//store the id of the selected node
     //holds all selected node IDs
     ArrayList<String> selectedNode = new ArrayList<>();//store all highlighted nodes
     ArrayList<VisualItem> selectedNodeVisualItem = new ArrayList<>();
@@ -115,8 +116,9 @@ public class Concluder {
         fio.setCurrentDirectory(curDir);
         hv = new HierarchyVisualization();
 
-        frame = new JFrame("JConcluder");
-        frame.setTitle("JConcluder");
+        frame = new JFrame(ConcluderConstant.JCONCLUDER);
+        frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/conclude.png")));
+        frame.setTitle(ConcluderConstant.JCONCLUDER);
         frame.getContentPane().setLayout(new BorderLayout());
         frame.setLocationRelativeTo(null);
 
@@ -132,20 +134,20 @@ public class Concluder {
         viewMode = 1;
     }
 
-    //sort an array
-    public static void sort(float[] data) //sort
-    {
-        for (int j = 1; j <= data.length; j++) {
-            for (int i = 0; i < data.length - 1; i++) {
-                if (data[i] < data[i + 1]) {
-                    float temp;
-                    temp = data[i];
-                    data[i] = data[i + 1];
-                    data[i + 1] = temp;
-                }
-            }
-        }
-    }
+//    //sort an array
+//    public static void sort(float[] data) //sort
+//    {
+//        for (int j = 1; j <= data.length; j++) {
+//            for (int i = 0; i < data.length - 1; i++) {
+//                if (data[i] < data[i + 1]) {
+//                    float temp;
+//                    temp = data[i];
+//                    data[i] = data[i + 1];
+//                    data[i + 1] = temp;
+//                }
+//            }
+//        }
+//    }
 
     public static void main(String[] args) {
         FlatLightFlatIJTheme.install();
@@ -415,10 +417,7 @@ public class Concluder {
         public void actionPerformed(ActionEvent arg0) {
             if (file != null) {
                 viewMode = 1;
-                //frame.remove(hv.d);
                 viewModeRequested(viewMode);
-                //hv.runLayout();
-                //frame.add(hv.d);
             }
         }
     }
@@ -440,10 +439,7 @@ public class Concluder {
         public void actionPerformed(ActionEvent e) {
             //initial launch or previous file was closed
             if (file != null) {
-                String exception = fio.saveFile(file, tree, graph, fileType);
-                if (!exception.equals("0")) {
-                }
-            } else {
+                fio.saveFile(file, tree, graph, fileType);
             }
         }
     }
@@ -453,7 +449,7 @@ public class Concluder {
             //initial launch or previous file was closed
             // can be simplified
             if (file != null) {
-                String exception = fio.saveFileAs(curDir, file.getName().substring(0, file.getName().indexOf(".")), graph, tree, fileType);
+                fio.saveFileAs(curDir, file.getName().substring(0, file.getName().indexOf(".")), graph, tree, fileType);
                 curDir = fio.getCurrentDirectory();
             }
         }

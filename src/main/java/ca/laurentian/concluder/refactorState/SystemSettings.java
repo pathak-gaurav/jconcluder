@@ -46,7 +46,7 @@ public class SystemSettings extends JDialog {
                 exitCode = 0;
             }
         });
-
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/conclude.png")));
         setTitle("System Configuration");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

@@ -64,7 +64,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ca.laurentian.concluder.JConcluder</mainClass>
+                            <mainClass>ca.laurentian.concluder.Concluder</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

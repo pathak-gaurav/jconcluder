@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 
 public class AddNewNode {
 
+    //Costructor
     public AddNewNode(Graph graph, Node source, String name, String desc, JFrame frame, int viewMode) {
         //the new node that is requested to be added to the graph
         //no edge to parent, isolated
