@@ -12,34 +12,16 @@ import ca.laurentian.concluder.refactorState.SystemSettings;
 import ca.laurentian.concluder.refactorState.TreeStructureValidation;
 import ca.laurentian.concluder.refactorState.ViewModeAdministrator;
 import ca.laurentian.concluder.refactorState.Weight_Redistributor;
-import com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme;
+import ca.laurentian.concluder.treemap.Treemap;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Tree;
 import prefuse.visual.VisualItem;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Panel;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -50,7 +32,9 @@ import java.net.URI;
 import java.util.ArrayList;
 
 import static ca.laurentian.concluder.constants.ConcluderConstant.RELATE;
+import static ca.laurentian.concluder.constants.ConcluderConstant.TREEMAP;
 import static ca.laurentian.concluder.constants.ConcluderConstant.UNLINK;
+import static com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme.install;
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 
 public class Concluder {
@@ -79,7 +63,7 @@ public class Concluder {
     JFrame frame;
     JLabel statusbar;
     JToolBar toolbar;
-    ToolbarButton tbb, btnNew, btnOpen, btnSave, btnPrint, btnAdd, btnDelete, btnLink, btnUnlink;
+    ToolbarButton tbb, btnNew, btnOpen, btnSave, btnPrint, btnAdd, btnDelete, btnLink, btnUnlink,treeMap;
     JMenuItem mnuItemClose, mnuItemSave, mnuItemSaveAs, mnuItemPrint;
     //handles all file operations
     private final FileIO fio;
@@ -134,23 +118,8 @@ public class Concluder {
         viewMode = 1;
     }
 
-//    //sort an array
-//    public static void sort(float[] data) //sort
-//    {
-//        for (int j = 1; j <= data.length; j++) {
-//            for (int i = 0; i < data.length - 1; i++) {
-//                if (data[i] < data[i + 1]) {
-//                    float temp;
-//                    temp = data[i];
-//                    data[i] = data[i + 1];
-//                    data[i + 1] = temp;
-//                }
-//            }
-//        }
-//    }
-
     public static void main(String[] args) {
-        FlatLightFlatIJTheme.install();
+        install();
         Concluder c = new Concluder();
         c.launchFrame();
     }
@@ -175,6 +144,8 @@ public class Concluder {
                 .getResource("/images/unlink_int.png")), UNLINK);
         tbb = new ToolbarButton(RELATE, new ImageIcon(getClass()
                 .getResource("/images/balance-scale.png")), RELATE);
+        treeMap = new ToolbarButton(TREEMAP, new ImageIcon(getClass()
+                  .getResource("/images/treemap_chart.png")), TREEMAP);
         toolbar.setFloatable(true);
         toolbar.add(btnNew);
         toolbar.add(btnOpen);
@@ -187,6 +158,7 @@ public class Concluder {
         toolbar.add(btnUnlink);
         toolbar.addSeparator();
         toolbar.add(tbb);
+        toolbar.add(treeMap);
         toolbar.addSeparator();
         frame.add(toolbar, BorderLayout.NORTH);
     }
@@ -301,6 +273,7 @@ public class Concluder {
         btnLink.addActionListener(new ListenLink());
         btnUnlink.addActionListener(new ListenUnlink());
         mnuItemClose.addActionListener(new ListenMenuClose());
+        treeMap.addActionListener(new TreeMapListner());
         mnuItemQuit.addActionListener(new ListenMenuQuit());
         mnuItemStatus.addActionListener(new ListenStatus());
         mnuItemToolbar.addActionListener(new ListenToolbar());
@@ -336,6 +309,7 @@ public class Concluder {
         btnDelete.setEnabled(b);
         btnLink.setEnabled(b);
         btnUnlink.setEnabled(b);
+        treeMap.setEnabled(b);
         tbb.setEnabled(b);
     }
 
@@ -589,12 +563,22 @@ public class Concluder {
         }
     }
 
+    public class TreeMapListner implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(selectedNode.size() >= 1){
+               Treemap treemap = new Treemap(graph.getNodeCount(),graph, hv);
+            }else{
+                JOptionPane.showMessageDialog(null,"Please add at least one node");
+            }
+        }
+    }
+
     //connect two nodes
     public class ListenLink implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             if (selectedNode.size() == 2)//connect 2 selected nodes
             {
-
                 if (fileType.compareTo(SystemConfiguration.TREE_FILE) == 0) {
                     //upon unlink of real tree graph
                     //edge is removed from graph

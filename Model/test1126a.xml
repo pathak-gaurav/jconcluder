@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- prefuse TreeML Writer | Mon Jan 04 18:04:04 EST 2021 -->
+<tree>
+  <declarations>
+    <attributeDecl name="name" type="String"/>
+    <attributeDecl name="weight" type="Real"/>
+    <attributeDecl name="desc" type="String"/>
+    <attributeDecl name="rel" type="String"/>
+    <attributeDecl name="noddis" type="String"/>
+    <attributeDecl name="weight2" type="Real"/>
+    <attributeDecl name="Node_ID" type="Int"/>
+    <attributeDecl name="Linguistic_Term" type="String"/>
+  </declarations>
+
+  <branch>
+    <attribute name="name" value="ROOT"/>
+    <attribute name="weight" value="100.0"/>
+    <attribute name="desc" value=""/>
+    <attribute name="rel" value="1 1 1"/>
+    <attribute name="noddis" value="ROOT
+100,0"/>
+    <attribute name="weight2" value="100.0"/>
+    <attribute name="Node_ID" value="777"/>
+    <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+    <branch>
+      <attribute name="name" value="a"/>
+      <attribute name="weight" value="33.33333333333333"/>
+      <attribute name="desc" value=""/>
+      <attribute name="rel" value="Single Child"/>
+      <attribute name="noddis" value="a
+33,3"/>
+      <attribute name="weight2" value="33.33333333333333"/>
+      <attribute name="Node_ID" value="1"/>
+      <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+      <leaf>
+        <attribute name="name" value="c"/>
+        <attribute name="weight" value="33.33333333333333"/>
+        <attribute name="desc" value=""/>
+        <attribute name="rel" value="No Children"/>
+        <attribute name="noddis" value="c
+100,0"/>
+        <attribute name="weight2" value="100.0"/>
+        <attribute name="Node_ID" value="3"/>
+        <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+      </leaf>
+    </branch>
+    <branch>
+      <attribute name="name" value="b"/>
+      <attribute name="weight" value="33.33333333333333"/>
+      <attribute name="desc" value=""/>
+      <attribute name="rel" value="1 1 1 1 1 1"/>
+      <attribute name="noddis" value="b
+33,3"/>
+      <attribute name="weight2" value="33.33333333333333"/>
+      <attribute name="Node_ID" value="2"/>
+      <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+      <leaf>
+        <attribute name="name" value="d"/>
+        <attribute name="weight" value="8.333333333333332"/>
+        <attribute name="desc" value=""/>
+        <attribute name="rel" value="No Children"/>
+        <attribute name="noddis" value="d
+25,0"/>
+        <attribute name="weight2" value="25.0"/>
+        <attribute name="Node_ID" value="4"/>
+        <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+      </leaf>
+      <leaf>
+        <attribute name="name" value="e"/>
+        <attribute name="weight" value="8.333333333333332"/>
+        <attribute name="desc" value=""/>
+        <attribute name="rel" value="No Children"/>
+        <attribute name="noddis" value="e
+25,0"/>
+        <attribute name="weight2" value="25.0"/>
+        <attribute name="Node_ID" value="5"/>
+        <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+      </leaf>
+      <leaf>
+        <attribute name="name" value="f"/>
+        <attribute name="weight" value="8.333333333333332"/>
+        <attribute name="desc" value=""/>
+        <attribute name="rel" value="No Children"/>
+        <attribute name="noddis" value="f
+25,0"/>
+        <attribute name="weight2" value="25.0"/>
+        <attribute name="Node_ID" value="6"/>
+        <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+      </leaf>
+      <leaf>
+        <attribute name="name" value="g"/>
+        <attribute name="weight" value="8.333333333333332"/>
+        <attribute name="desc" value=""/>
+        <attribute name="rel" value="No Children"/>
+        <attribute name="noddis" value="g
+25,0"/>
+        <attribute name="weight2" value="25.0"/>
+        <attribute name="Node_ID" value="7"/>
+        <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+      </leaf>
+    </branch>
+    <leaf>
+      <attribute name="name" value="h"/>
+      <attribute name="weight" value="33.33333333333333"/>
+      <attribute name="desc" value=""/>
+      <attribute name="rel" value="No Children"/>
+      <attribute name="noddis" value="h
+33,3"/>
+      <attribute name="weight2" value="33.33333333333333"/>
+      <attribute name="Node_ID" value="8"/>
+      <attribute name="Linguistic_Term" value="Greater Than(&gt;)"/>
+    </leaf>
+  </branch>
+</tree>

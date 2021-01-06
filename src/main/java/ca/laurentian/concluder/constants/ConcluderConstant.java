@@ -19,6 +19,7 @@ public abstract class ConcluderConstant {
     public static final String RELATE = "Relate";
     public static final String NODE_ID = "Node_ID";
     public static final String JCONCLUDER = "JConcluder";
+    public static final String TREEMAP = "Treemap";
 
 
 
