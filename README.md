@@ -2,6 +2,8 @@
 
 [The java version of concluder - The consistency-driven pairwise comparisons method (CDPC)](https://web.cs.laurentian.ca/wkoczkodaj/p/JACS_BSN2009.pdf)
 
+[Download JConcluder](https://github.com/pathak-gaurav/jconcluder/releases/download/Treemap/jconcluder-1.0-SNAPSHOT.jar)
+
 >A simple tool for complex decision making.
 The consistency-driven pairwise comparisons method (CDPC) is primarily for multi-criteria decision making. Pairwise comparisons have been used for projects of national importance (e.g., the use of nuclear power). This project was originally financed by the Ministry of Northern Ontario and Mines well as Euro Grant (Human Capital). It is a standalone system but could also be used with any expert or knowledge management system.
 
