@@ -1,4 +1,8 @@
-# JConcluder
+## DEPRECATED <former description>
+  
+This project has reached the end of its development as a pairwise comparisions project. Feel free to browse the code, but please use the latest development project [pairwise comparisons](https://github.com/pathak-gaurav/pairwise-comparision)
+    
+# JConcluder 
 
 [The java version of concluder - The consistency-driven pairwise comparisons method (CDPC)](https://web.cs.laurentian.ca/wkoczkodaj/p/JACS_BSN2009.pdf)
 
